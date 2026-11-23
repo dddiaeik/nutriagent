@@ -223,6 +223,7 @@ __marimo__/
 .streamlit/secrets.toml
 
 # Local NutriAgent data and model files
+/data/raw/  # Original K-FIND downloads; local preprocessing input
 /data/private/
 /data/reference.pdf
 /records/
