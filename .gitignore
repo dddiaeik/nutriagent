@@ -221,3 +221,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local NutriAgent data and model files
+/data/
+/uploads/
+/models/
+/.ollama/
+*.gguf
+*.safetensors
