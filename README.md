@@ -9,6 +9,28 @@ Python이 등록 식품의 열량, 탄수화물, 단백질, 지방을 계산합�
 
 화면은 실행 모드와 각 응답의 출처를 표시합니다. Ollama 요청이 실패하면 연결 또는 모델 상태를 확인하라는 안내를 표시합니다.
 
+## NutriGap K-FIND 한국 음식 확장 (개선 브랜치)
+
+기존 USDA 12종을 보존하고 K-FIND 음식 98종을 추가합니다. K-FIND 영양성분은 100g 기준이며 검증된 1인분 중량이 없으므로 g 또는 kg으로 입력해야 합니다.
+
+- 음식 데이터는 `data/foods.json`(USDA 12종), `data/foods_kfind_v1.json`(K-FIND 98종)으로 분리합니다.
+- 같은 단어가 충돌하면 K-FIND 정확한 이름을 우선합니다. 예: `쌀밥`은 K-FIND, `흰쌀밥`은 USDA입니다.
+- 원본 Excel 파일은 `data/raw/음식 DB.xlsx`에만 보관하며 Git에는 올리지 않습니다. 앱 실행에는 원본 Excel이 필요하지 않습니다.
+- 누락된 값은 0으로 대체하지 않으며 100ml 기준 데이터를 100g으로 환산하지 않습니다.
+
+Windows PowerShell에서 준비된 Python 3.11.9 가상환경으로 한 번에 검증:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\validate_nutrigap.ps1
+# 원본 엑셀까지 반드시 검사하려면 -RequireSource 옵션 추가
+# 실제 Qwen3:8B 호출까지 검증하려면 -Live 옵션 추가
+```
+
+데이터 출처·검증·한계는 [NutriGap K-FIND 자동 검증 가이드](docs/NUTRIGAP_KFIND_AUTOMATION.md)를 참고하세요.
+
+예시 입력: `김치찌개 200g과 쌀밥 150g의 영양소를 계산해 줘`.
+
+**하루 누적 영양 분석과 개인화된 NutriGap 추천은 다음 개발 단계**입니다. 데이터 확장만으로 개인화 추천이 구현되었다고 주장하지 않습니다.
 ## 설치와 실행
 
 Python 3.11.9로 저장소 루트에서 실행합니다.
