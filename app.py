@@ -4,10 +4,13 @@ import httpx
 import ollama
 import streamlit as st
 
-from agent import MODEL_NAME, PDF_TITLE, PDF_URL, is_model_available, run_turn
+from agent import (
+    MOCK_SCENARIOS, MODEL_NAME, PDF_TITLE, PDF_URL, Mode, configured_mode, is_model_available, run_turn,
+)
 from nutrition import FOODS, NUTRIENTS, SOURCE, SOURCE_URL, compare_goals
 
 LABELS = {"kcal": "열량 (kcal)", "carbs_g": "탄수화물 (g)", "protein_g": "단백질 (g)", "fat_g": "지방 (g)"}
+MODE_LABELS = {Mode.MOCK: "MOCK · 미리 정의한 응답", Mode.OLLAMA: f"OLLAMA · {MODEL_NAME} 요청"}
 
 
 def nutrient_row(values):
@@ -15,6 +18,7 @@ def nutrient_row(values):
 
 
 def render_reply(reply, turn_id, goals, records):
+    st.caption(MODE_LABELS[reply.mode])
     st.write(reply.text)
     if reply.food:
         food = reply.food
@@ -50,7 +54,17 @@ def render_reply(reply, turn_id, goals, records):
 
 st.set_page_config(page_title="NutriAgent Lite")
 st.title("NutriAgent Lite")
+try:
+    mode = configured_mode()
+except ValueError as error:
+    st.error(str(error))
+    st.stop()
+st.caption(f"실행 모드: {MODE_LABELS[mode]}")
 st.caption("식품 12종의 영양소를 계산합니다. 이 데모에서는 1인분을 100g으로 계산합니다.")
+
+if mode == Mode.MOCK:
+    with st.expander("MOCK 예시 문장"):
+        st.code("\n".join(MOCK_SCENARIOS), language="text")
 
 if "turns" not in st.session_state:
     st.session_state.turns = []
@@ -60,7 +74,7 @@ turns = st.session_state.turns
 records = st.session_state.records
 
 with st.sidebar:
-    if st.button(f"Ollama 모델 확인 ({MODEL_NAME})"):
+    if mode == Mode.OLLAMA and st.button(f"Ollama 모델 확인 ({MODEL_NAME})"):
         try:
             installed = is_model_available()
         except (ConnectionError, httpx.RequestError, ollama.ResponseError):
@@ -94,7 +108,7 @@ if prompt:
     ]
     history.append({"role": "user", "content": prompt})
     with st.spinner("요청을 해석하는 중…"):
-        reply = run_turn(history, previous, goals=goals)
+        reply = run_turn(history, previous, mode=mode, goals=goals)
     turns.append((prompt, reply))
 
 for turn_id, (question, reply) in enumerate(turns):

@@ -1,9 +1,11 @@
-"""Interpret requests with Qwen3 and execute local tools with Python."""
+"""Run shared nutrition tools using scripted responses or live Qwen3."""
 
 import hashlib
 import json
+import os
 import re
 from dataclasses import asdict, dataclass, field
+from enum import StrEnum
 from pathlib import Path
 
 import httpx
@@ -17,12 +19,24 @@ PDF_PATH = DATA / "reference.pdf"
 PDF_TITLE = "USDA/HHS Dietary Guidelines for Americans, 2025–2030"
 PDF_URL = "https://cdn.realfood.gov/DGA.pdf"
 PDF_SHA256 = "c34f1bec5c9416265670b7fcb24556bb8616ba95e8de2f2890460b6bbca1a472"
-CLIENT = ollama.Client(timeout=90)
+
+
+class Mode(StrEnum):
+    MOCK = "MOCK"
+    OLLAMA = "OLLAMA"
+
+
+def configured_mode() -> Mode:
+    value = os.getenv("NUTRIAGENT_MODE", Mode.MOCK).strip().upper()
+    try:
+        return Mode(value)
+    except ValueError:
+        raise ValueError("NUTRIAGENT_MODE를 MOCK 또는 OLLAMA로 설정해 주세요.") from None
 
 
 def is_model_available() -> bool:
     """Check whether the configured Ollama server has the model installed."""
-    return any(model.model == MODEL_NAME for model in CLIENT.list().models)
+    return any(model.model == MODEL_NAME for model in ollama.Client(timeout=5).list().models)
 
 
 def _tool(name, description, properties):
@@ -83,6 +97,37 @@ find_food. For calculation use calculate_meal. For a candidate use recommend_mea
 """
 
 
+MOCK_SCENARIOS = {
+    "닭가슴살 2인분과 흰쌀밥 100g을 계산해 줘": ("calculate_meal", {"items": [
+        {"food": "닭가슴살", "quantity": 2, "unit": "serving"},
+        {"food": "흰쌀밥", "quantity": 100, "unit": "g"},
+    ]}),
+    "두부와 흰쌀밥을 추천해 줘": ("recommend_meal", {"items": [
+        {"food": "두부", "quantity": 100, "unit": "g"},
+        {"food": "흰쌀밥", "quantity": 100, "unit": "g"},
+    ]}),
+    "닭가슴살 대신 두부": ("replace_food", {"old_food": "닭가슴살", "new_food": "두부"}),
+    "두부 영양소를 조회해 줘": ("find_food", {"name": "두부"}),
+    "두부를 조금 먹었어": ("ask_clarification", {"missing": "quantity"}),
+    "떡볶이 100g을 계산해 줘": ("calculate_meal", {"items": [
+        {"food": "떡볶이", "quantity": 100, "unit": "g"},
+    ]}),
+    "영양 가이드에서 whole grains를 검색해 줘": ("search_guidelines", {"query": "whole grains"}),
+}
+
+
+def _mock_message(messages: list) -> ollama.Message:
+    last = messages[-1]
+    if last["role"] == "user":
+        scenario = MOCK_SCENARIOS.get(last["content"].strip())
+        if scenario:
+            name, args = scenario
+            return ollama.Message(role="assistant", tool_calls=[
+                ollama.Message.ToolCall(function=ollama.Message.ToolCall.Function(name=name, arguments=args))
+            ])
+    return ollama.Message(role="assistant")
+
+
 def search_guidelines(path: Path, query: str) -> list[dict]:
     if not isinstance(query, str) or not query.strip() or len(query) > 100:
         raise InputError("검색할 짧은 영문 키워드를 알려 주세요.")
@@ -114,6 +159,7 @@ def search_guidelines(path: Path, query: str) -> list[dict]:
 
 @dataclass
 class Reply:
+    mode: Mode
     text: str = "음식과 섭취량을 알려 주시거나, 조회 또는 추천 요청을 구체적으로 입력해 주세요."
     meal: Meal | None = None
     kind: str | None = None
@@ -153,19 +199,26 @@ def _execute(name, args, reply, previous_meal, pdf_path):
 
 
 def run_turn(history: list[dict], previous_meal: Meal | None = None, *,
-             goals: dict | None = None, pdf_path: Path = PDF_PATH) -> Reply:
+             mode: Mode | None = None, goals: dict | None = None, pdf_path: Path = PDF_PATH) -> Reply:
     """Use tool calls as proposals; present only Python-verified results."""
     catalog = ", ".join(food["name"] for food in FOODS)
     previous = [(line.food["name"], line.grams) for line in previous_meal.lines] if previous_meal else []
     context = f"Catalog: {catalog}. Previous meal (grams): {previous}. User goals: {goals or {}}."
     messages = [{"role": "system", "content": SYSTEM_PROMPT + "\n" + context}, *history]
-    reply = Reply()
+    mode = configured_mode() if mode is None else Mode(mode)
+    client = ollama.Client(timeout=90) if mode == Mode.OLLAMA else None
+    reply = Reply(mode)
+    if mode == Mode.MOCK:
+        reply.text = "등록된 MOCK 예시를 입력해 주세요. 화면의 예시 목록에서 복사할 수 있습니다."
     for _ in range(3):
         try:
-            message = CLIENT.chat(model=MODEL_NAME, messages=messages, tools=TOOLS,
-                                  think=False, options={"temperature": 0}).message
+            if client is None:
+                message = _mock_message(messages)
+            else:
+                message = client.chat(model=MODEL_NAME, messages=messages, tools=TOOLS,
+                                      think=False, options={"temperature": 0}).message
         except (ConnectionError, httpx.RequestError, ollama.ResponseError):
-            return Reply(text=f"Ollama에 연결해 {MODEL_NAME} 모델을 실행할 수 없습니다. 서버와 모델 설치 상태를 확인해 주세요.",
+            return Reply(mode, text=f"Ollama에 연결해 {MODEL_NAME} 모델을 실행할 수 없습니다. 서버와 모델 설치 상태를 확인해 주세요.",
                          tool_log=reply.tool_log)
         if not message.tool_calls:
             return reply
@@ -176,7 +229,7 @@ def run_turn(history: list[dict], previous_meal: Meal | None = None, *,
                 result = _execute(name, args, reply, previous_meal, pdf_path)
             except InputError as error:
                 reply.tool_log.append({"tool": name, "input": args, "status": str(error)})
-                return Reply(text=str(error), tool_log=reply.tool_log)
+                return Reply(mode, text=str(error), tool_log=reply.tool_log)
             reply.tool_log.append({"tool": name, "input": args, "status": "완료"})
             messages.append({"role": "tool", "tool_name": name, "content": json.dumps(result, ensure_ascii=False)})
         if reply.meal is not None or reply.hits or name == "search_guidelines":
