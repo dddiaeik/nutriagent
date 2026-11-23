@@ -1,4 +1,4 @@
-# NutriGap K-FIND V1 — data integration and automation
+# NutriGap V1.2 — data integration and validation
 
 ## Protected baseline
 - Baseline: feature/nutriagent-mvp, commit a874a1cb2837e47e9ce101b4acda202a77c988fd.
@@ -31,19 +31,29 @@ Optional real Ollama tool-calling test on a machine where qwen3:8b is installed:
 
 - Offline pytest and validation require no Ollama service. The live test is opt-in.
 - The validator reads the XLSX without modifying it; exact source SHA-256 and every selected food's code/metadata/macro values must agree.
-- GitHub Actions (.github/workflows/nutrigap-tests.yml) automatically tests on pushes to this feature branch and PRs targeting main. If branch CI is not available, run the local script and report its output.
+- GitHub Actions runs offline checks on pushes to the improvement branch and on PRs targeting either protected branch. The job pins Ubuntu 24.04, which has a published Python 3.11.9 build.
 
 ## Demo prompts in actual OLLAMA mode
 - "김치찌개 200g과 쌀밥 150g의 영양소를 계산해 줘"
 - "제육볶음 150g의 단백질은?"
 - "김치찌개 1인분 먹었어" → ask for grams; do not guess.
 - "흰쌀밥 100g" → existing USDA example stays supported.
+- Confirm the kimchi stew and rice meal, set the demo goals to 820 kcal and 60 g protein, then ask "오늘 목표에 맞춰 저녁을 추천해 줘".
+- Ask "닭가슴살 대신 두부" to compare the next meal's nutrients and target gap after a same-weight substitution.
 
-## Next stage (separate acceptance checkpoint)
-The present change extends **food lookup and arithmetic only**. It does not imply that recommendations are truly based on the confirmed daily intake. Next implement:
-1. Aggregate only confirmed session meal records; no double saving.
-2. Calculate gaps only for user-configured calorie/macro targets, not clinical deficiencies.
-3. Use a bounded, Python-ranked menu candidate list with traceable sources and explicit assumptions.
-4. Explain top candidates, after-target impacts and substitution deltas; keep suggestions separate from actually eaten food.
-5. Investigate Chrome+Edge shared wheel-scroll lag. Profile reruns and large Streamlit tables; do not claim CSS hacks solved it without browser verification.
-6. Add offline tests + real Qwen regression demo. Merge only with user approval.
+## Recommendation and session scope
+
+- Today's total includes only confirmed, active records dated to the app host's local day. Each chat result can be confirmed once. Weight changes replace the saved meal; withdrawal excludes it from the total.
+- Qwen selects the tool. Python evaluates six fixed meals on the explicitly entered goals. Each target contributes its absolute gap divided by the goal value. The response shows up to three meals that improve the combined score and keeps them separate from intake records.
+- The latest three responses show full tables. Earlier replies show summaries, with full details available from the sidebar. Original calculation precision is retained.
+
+## Scroll reproduction
+
+In MOCK mode, submit the same valid meal calculation 30 times at 1280 × 900. From the bottom of the chat, wheel up quickly on the conversation pane. Measure scroll movement and any WebSocket messages during the wheel gesture separately from the server's rerun when submitting a chat message. Run the same steps in Chrome and Edge for a browser-specific manual check.
+
+## V1.2 verification results
+
+- The attached original workbook matched the pinned SHA-256. All 98 curated food codes, names, source basis, analysis methods, and four nutrient values matched the workbook.
+- The baseline passed 26 offline tests. The scroll and recommendation changes brought this to 31 passing tests. The opt-in model test is skipped by the offline suite.
+- In headless Chromium at 30 turns, the final submission produced 58,523 bytes of incoming WebSocket payload, down from 133,560 bytes at baseline. Three upward wheel gestures each moved the view by 2,200 pixels without a WebSocket message. Chrome and Edge manual confirmation is pending.
+- The separate live test could not connect to Ollama in the cloud, so no Qwen3:8B inference was verified there.

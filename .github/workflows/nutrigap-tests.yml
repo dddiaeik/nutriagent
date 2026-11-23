@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   python-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     steps:
       - name: Checkout
@@ -32,7 +32,7 @@ jobs:
       - name: Check dependencies
         run: python -m pip check
       - name: Compile Python
-        run: python -m compileall -q app.py agent.py nutrition.py kfind_catalog.py scripts tests
+        run: python -m compileall -q app.py agent.py nutrition.py nutrigap.py kfind_catalog.py scripts tests
       - name: Run offline regression tests
         env:
           NUTRIAGENT_MODE: MOCK

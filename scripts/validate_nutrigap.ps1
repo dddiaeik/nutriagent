@@ -1,4 +1,4 @@
-param(
+﻿param(
     [switch]$Live,
     [switch]$RequireSource
 )
@@ -6,7 +6,12 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 Set-Location $root
-$python = Join-Path $root '.venv\Scripts\python.exe'
+$venvPython = if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT) {
+    '.venv/Scripts/python.exe'
+} else {
+    '.venv/bin/python'
+}
+$python = Join-Path $root $venvPython
 if (!(Test-Path $python)) {
     throw "Missing Python venv: $python. Create it with Python 3.11.9 and install requirements.txt first."
 }
@@ -18,9 +23,9 @@ if ($LASTEXITCODE -ne 0) { throw "Python failed" }
 if ($LASTEXITCODE -ne 0) { throw "pip check failed" }
 
 Write-Host "[2/4] K-FIND source provenance"
-$xlsx = Join-Path $root 'data\raw\음식 DB.xlsx'
+$xlsx = Join-Path $root 'data/raw/음식 DB.xlsx'
 if (Test-Path $xlsx) {
-    & $python scripts\verify_kfind_source.py $xlsx
+    & $python scripts/verify_kfind_source.py $xlsx
     if ($LASTEXITCODE -ne 0) { throw "K-FIND source check failed" }
 } elseif ($RequireSource) {
     throw "Required original workbook missing: $xlsx"
@@ -29,7 +34,7 @@ if (Test-Path $xlsx) {
 }
 
 Write-Host "[3/4] Python compile and offline pytest"
-& $python -m compileall -q app.py agent.py nutrition.py kfind_catalog.py scripts tests
+& $python -m compileall -q app.py agent.py nutrition.py nutrigap.py kfind_catalog.py scripts tests
 if ($LASTEXITCODE -ne 0) { throw "Compilation failed" }
 $env:NUTRIAGENT_MODE = "MOCK"
 $env:NUTRIAGENT_LIVE_OLLAMA = "0"

@@ -121,7 +121,7 @@ def test_mock_ui_confirmation_and_recommendation(monkeypatch):
     screen.button(key="record-0").click().run()
     screen.run()
     assert len(screen.session_state.records) == 1
-    assert screen.session_state.records[0].totals["kcal"] == 460
+    assert screen.session_state.records[0].meal.totals["kcal"] == 460
     assert all(button.key != "record-0" for button in screen.button)
     screen.chat_input[0].set_value("닭가슴살 대신 두부").run()
     screen.chat_input[0].set_value("두부와 흰쌀밥을 추천해 줘").run()
@@ -130,6 +130,22 @@ def test_mock_ui_confirmation_and_recommendation(monkeypatch):
     assert all(not (button.key or "").startswith("record-") for button in screen.button)
     assert screen.session_state.turns[1][1].meal.totals["kcal"] == 418
     assert screen.session_state.turns[2][1].meal.totals["kcal"] == 274
+
+
+def test_chat_history_keeps_old_meal_details_and_confirmation_accessible(monkeypatch):
+    monkeypatch.setenv("NUTRIAGENT_MODE", "MOCK")
+    screen = AppTest.from_file("app.py", default_timeout=15).run()
+    for _ in range(4):
+        screen.chat_input[0].set_value("닭가슴살 2인분과 흰쌀밥 100g을 계산해 줘").run()
+    assert not screen.exception
+    assert len(screen.table) == 3
+    assert any("합계 열량 (kcal) 460" in caption.value for caption in screen.caption)
+    screen.selectbox[0].select(0).run()
+    assert len(screen.table) == 4
+    screen.button(key="record-0").click().run()
+    assert not screen.exception
+    assert list(screen.session_state.records) == [0]
+    assert screen.session_state.records[0].meal.totals["kcal"] == 460
 
 
 def test_ollama_connection_error_does_not_use_mock_scenario(monkeypatch):
@@ -181,3 +197,8 @@ def test_live_qwen_inference():
     assert reply.kind == "intake", reply.text
     assert reply.meal.totals["kcal"] == 144
     assert reply.meal.totals["protein_g"] == pytest.approx(17.27)
+    dinner = agent.run_turn(history("오늘 남은 영양 목표에 맞춰 저녁을 추천해 줘."),
+                            mode=agent.Mode.OLLAMA, goals={"kcal": 590, "protein_g": 60},
+                            today_totals=reply.meal.totals)
+    assert dinner.candidates and dinner.kind == "recommendation", dinner.text
+    assert dinner.impact.before["kcal"] == 446

@@ -12,7 +12,8 @@ import httpx
 import ollama
 import pymupdf
 
-from nutrition import DATA, FOODS, ALL_FOODS, InputError, Meal, calculate, find_food, replace_food
+from nutrition import ALL_FOODS, DATA, NUTRIENTS, InputError, Meal, calculate, find_food, replace_food
+from nutrigap import Candidate, GoalImpact, evaluate_meal, rank_candidates
 
 MODEL_NAME = "qwen3:8b"
 PDF_PATH = DATA / "reference.pdf"
@@ -75,7 +76,8 @@ QUESTIONS = {
 TOOLS = [
     _tool("find_food", "Look up the explicitly named food; preserve unknown names.", {"name": TEXT}),
     _tool("calculate_meal", "Calculate stated intake. Never assume unspecified amounts.", {"items": ITEMS}),
-    _tool("recommend_meal", "Calculate a proposed meal, never an intake record.", {"items": ITEMS}),
+    _tool("recommend_meal", "Calculate a specific proposed meal, never an intake record.", {"items": ITEMS}),
+    _tool("recommend_for_goals", "Rank fixed dinner candidates against today's confirmed intake and goals.", {}),
     _tool("replace_food", "Substitute foods at the same weight in the previous meal.", {"old_food": TEXT, "new_food": TEXT}),
     _tool("search_guidelines", "Search the reference PDF by a short English keyword.", {"query": TEXT}),
     _tool("ask_clarification", "Ask for missing or ambiguous information.", {
@@ -92,12 +94,18 @@ call ask_clarification. Pass unregistered foods unchanged; never replace them wi
 Only propose amounts for recommendations, using foods from the catalog. For an explicit '대신'
 request with a previous meal, use replace_food, keeping each item's gram weight. No tool records intake;
 that requires an explicit UI confirmation. Never invent nutrients, guideline text, or citations.
+For a dinner recommendation or any recommendation based on today's nutrition goals or remaining
+intake, call recommend_for_goals. Python chooses the candidates and amounts. Do not propose your own.
 For guideline questions use a short English keyword for search_guidelines. For ordinary lookup use
-find_food. For calculation use calculate_meal. For a candidate use recommend_meal.
+find_food. For intake calculation use calculate_meal. For a specific proposed meal use recommend_meal.
 """
 
 
 MOCK_SCENARIOS = {
+    "김치찌개 200g과 쌀밥 150g을 계산해 줘": ("calculate_meal", {"items": [
+        {"food": "김치찌개", "quantity": 200, "unit": "g"},
+        {"food": "쌀밥", "quantity": 150, "unit": "g"},
+    ]}),
     "닭가슴살 2인분과 흰쌀밥 100g을 계산해 줘": ("calculate_meal", {"items": [
         {"food": "닭가슴살", "quantity": 2, "unit": "serving"},
         {"food": "흰쌀밥", "quantity": 100, "unit": "g"},
@@ -106,6 +114,7 @@ MOCK_SCENARIOS = {
         {"food": "두부", "quantity": 100, "unit": "g"},
         {"food": "흰쌀밥", "quantity": 100, "unit": "g"},
     ]}),
+    "오늘 목표에 맞춰 저녁을 추천해 줘": ("recommend_for_goals", {}),
     "닭가슴살 대신 두부": ("replace_food", {"old_food": "닭가슴살", "new_food": "두부"}),
     "두부 영양소를 조회해 줘": ("find_food", {"name": "두부"}),
     "두부를 조금 먹었어": ("ask_clarification", {"missing": "quantity"}),
@@ -163,12 +172,15 @@ class Reply:
     text: str = "음식과 섭취량을 알려 주시거나, 조회 또는 추천 요청을 구체적으로 입력해 주세요."
     meal: Meal | None = None
     kind: str | None = None
+    candidates: list[Candidate] = field(default_factory=list)
+    impact: GoalImpact | None = None
+    changes: dict[str, float] = field(default_factory=dict)
     food: dict | None = None
     hits: list[dict] = field(default_factory=list)
     tool_log: list[dict] = field(default_factory=list)
 
 
-def _execute(name, args, reply, previous_meal, pdf_path):
+def _execute(name, args, reply, previous_meal, pdf_path, today_totals, goals):
     match name:
         case "find_food":
             reply.food = find_food(args.get("name"))
@@ -179,11 +191,22 @@ def _execute(name, args, reply, previous_meal, pdf_path):
             reply.kind = "intake" if name == "calculate_meal" else "recommendation"
             reply.text = "섭취량을 계산했습니다." if reply.kind == "intake" else "추천 후보의 영양소를 계산했습니다."
             return asdict(reply.meal)
+        case "recommend_for_goals":
+            reply.candidates = rank_candidates(today_totals, goals)[:3]
+            if not reply.candidates:
+                reply.text = "설정한 목표에 더 가까워지는 저녁 후보를 찾지 못했습니다."
+                return []
+            best = reply.candidates[0]
+            reply.meal, reply.impact, reply.kind = best.meal, best.impact, "recommendation"
+            reply.text = f"오늘의 목표에 가장 가까워지는 후보는 {best.name}입니다."
+            return [asdict(candidate) for candidate in reply.candidates]
         case "replace_food":
             if previous_meal is None:
                 raise InputError(QUESTIONS["meal"])
             reply.meal = replace_food(previous_meal, args.get("old_food"), args.get("new_food"))
             reply.kind = "recommendation"
+            reply.impact = evaluate_meal(reply.meal, today_totals, goals)
+            reply.changes = {key: reply.meal.totals[key] - previous_meal.totals[key] for key in NUTRIENTS}
             reply.text = "이전 식단에서 요청한 음식을 같은 중량으로 바꿔 추천 후보를 다시 계산했습니다."
             return asdict(reply.meal)
         case "search_guidelines":
@@ -199,11 +222,14 @@ def _execute(name, args, reply, previous_meal, pdf_path):
 
 
 def run_turn(history: list[dict], previous_meal: Meal | None = None, *,
-             mode: Mode | None = None, goals: dict | None = None, pdf_path: Path = PDF_PATH) -> Reply:
+             mode: Mode | None = None, goals: dict | None = None, pdf_path: Path = PDF_PATH,
+             today_totals: dict | None = None) -> Reply:
     """Use tool calls as proposals; present only Python-verified results."""
     catalog = ", ".join(food["name"] for food in ALL_FOODS)
     previous = [(line.food["name"], line.grams) for line in previous_meal.lines] if previous_meal else []
-    context = f"Catalog: {catalog}. Previous meal (grams): {previous}. User goals: {goals or {}}."
+    goals = goals or {}
+    today_totals = today_totals if today_totals is not None else dict.fromkeys(NUTRIENTS, 0.0)
+    context = f"Catalog: {catalog}. Previous meal (grams): {previous}. User goals: {goals}."
     messages = [{"role": "system", "content": SYSTEM_PROMPT + "\n" + context}, *history]
     mode = configured_mode() if mode is None else Mode(mode)
     client = ollama.Client(timeout=90) if mode == Mode.OLLAMA else None
@@ -226,13 +252,13 @@ def run_turn(history: list[dict], previous_meal: Meal | None = None, *,
         for call in message.tool_calls:
             name, args = call.function.name, call.function.arguments
             try:
-                result = _execute(name, args, reply, previous_meal, pdf_path)
+                result = _execute(name, args, reply, previous_meal, pdf_path, today_totals, goals)
             except InputError as error:
                 reply.tool_log.append({"tool": name, "input": args, "status": str(error)})
                 return Reply(mode, text=str(error), tool_log=reply.tool_log)
             reply.tool_log.append({"tool": name, "input": args, "status": "완료"})
             messages.append({"role": "tool", "tool_name": name, "content": json.dumps(result, ensure_ascii=False)})
-        if reply.meal is not None or reply.hits or name == "search_guidelines":
-            return reply
+            if reply.meal is not None or name in ("search_guidelines", "recommend_for_goals"):
+                return reply
         # A lookup can be the first step of a calculation.
     return reply
