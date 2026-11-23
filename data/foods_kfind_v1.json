@@ -1,0 +1,2077 @@
+{
+  "meta": {
+    "source_name": "K-FIND 음식 DB",
+    "source_org": "식품의약품안전처",
+    "download_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do",
+    "source_file_sha256": "1ef3551f9a1d0ee87891d6306fa22bbd6a7ffcc90f2c70a4a184dbfe3fce6ea6",
+    "source_sheet": "음식(19,617건)",
+    "selection_rule": "100g basis, four macronutrient fields complete; home analyzed first",
+    "schema_version": "kfind-curated-v1",
+    "limitations": [
+      "Foods represent particular database recipes, not all restaurant variations.",
+      "100ml entries are intentionally excluded. 100ml is not equal to 100g.",
+      "Number-of-servings mapping is not validated; user should input grams.",
+      "No unverified nutritional value is imputed."
+    ]
+  },
+  "foods": [
+    {
+      "food_code": "D301-022000000-0001",
+      "name": "쌀밥",
+      "category": "밥류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 166,
+        "carbs_g": 37.33,
+        "protein_g": 3.36,
+        "fat_g": 0.32,
+        "sodium_mg": 0
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D101-050000000-0001",
+      "name": "현미밥",
+      "category": "밥류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 172,
+        "carbs_g": 38.9,
+        "protein_g": 3.1,
+        "fat_g": 0.47,
+        "sodium_mg": 2
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "230g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D101-032000000-0001",
+      "name": "잡곡밥",
+      "category": "밥류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 146,
+        "carbs_g": 29.33,
+        "protein_g": 5.3,
+        "fat_g": 0.87,
+        "sodium_mg": 3
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D101-016000000-0001",
+      "name": "보리밥",
+      "category": "밥류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 161,
+        "carbs_g": 36.77,
+        "protein_g": 2.9,
+        "fat_g": 0.24,
+        "sodium_mg": 4
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D101-018000000-0001",
+      "name": "비빔밥",
+      "category": "밥류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 142,
+        "carbs_g": 18.84,
+        "protein_g": 6.86,
+        "fat_g": 4.32,
+        "sodium_mg": 232
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "450g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D101-017070000-0001",
+      "name": "볶음밥_김치",
+      "category": "밥류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 167,
+        "carbs_g": 15.74,
+        "protein_g": 5.32,
+        "fat_g": 9.18,
+        "sodium_mg": 470
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "330g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D101-017260000-0001",
+      "name": "볶음밥_새우",
+      "category": "밥류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 172,
+        "carbs_g": 22.85,
+        "protein_g": 6.31,
+        "fat_g": 6.14,
+        "sodium_mg": 146
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "370g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D101-010150000-0001",
+      "name": "덮밥_돼지고기(제육)",
+      "category": "밥류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 202,
+        "carbs_g": 16.86,
+        "protein_g": 9.43,
+        "fat_g": 10.77,
+        "sodium_mg": 174
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "470g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D101-007000000-0001",
+      "name": "김밥",
+      "category": "밥류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 140,
+        "carbs_g": 19.98,
+        "protein_g": 4.84,
+        "fat_g": 4.55,
+        "sodium_mg": 307
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "230g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D101-007450000-0001",
+      "name": "김밥_참치",
+      "category": "밥류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 174,
+        "carbs_g": 20.26,
+        "protein_g": 7,
+        "fat_g": 7.22,
+        "sodium_mg": 335
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "250g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D101-044000000-0001",
+      "name": "카레라이스",
+      "category": "밥류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 108,
+        "carbs_g": 20.74,
+        "protein_g": 3.11,
+        "fat_g": 1.4,
+        "sodium_mg": 210
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "480g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D101-031000000-0001",
+      "name": "자장밥",
+      "category": "밥류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 122,
+        "carbs_g": 15.57,
+        "protein_g": 4.27,
+        "fat_g": 4.72,
+        "sodium_mg": 236
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "470g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D101-028000000-0001",
+      "name": "오므라이스",
+      "category": "밥류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 173,
+        "carbs_g": 20.54,
+        "protein_g": 6.5,
+        "fat_g": 7.23,
+        "sodium_mg": 433
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "400g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D101-047000000-0001",
+      "name": "콩나물밥",
+      "category": "밥류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 123,
+        "carbs_g": 22.39,
+        "protein_g": 4.68,
+        "fat_g": 1.58,
+        "sodium_mg": 272
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "320g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D306-266000000-0001",
+      "name": "김치찌개",
+      "category": "찌개 및 전골류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 61,
+        "carbs_g": 2.98,
+        "protein_g": 3.77,
+        "fat_g": 3.75,
+        "sodium_mg": 491
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "400g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D106-266100000-0001",
+      "name": "김치찌개_돼지고기",
+      "category": "찌개 및 전골류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 45,
+        "carbs_g": 1.04,
+        "protein_g": 4.25,
+        "fat_g": 2.71,
+        "sodium_mg": 207
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D106-266250000-0001",
+      "name": "김치찌개_참치",
+      "category": "찌개 및 전골류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 51,
+        "carbs_g": 2.9,
+        "protein_g": 3.59,
+        "fat_g": 2.82,
+        "sodium_mg": 264
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "300g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D106-275000000-0001",
+      "name": "된장찌개",
+      "category": "찌개 및 전골류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 46,
+        "carbs_g": 4.44,
+        "protein_g": 3.38,
+        "fat_g": 1.63,
+        "sodium_mg": 318
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D106-275110000-0001",
+      "name": "된장찌개_두부",
+      "category": "찌개 및 전골류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 41,
+        "carbs_g": 2.56,
+        "protein_g": 3.25,
+        "fat_g": 1.96,
+        "sodium_mg": 478
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "270g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D106-291030000-0001",
+      "name": "순두부찌개_김치",
+      "category": "찌개 및 전골류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 35,
+        "carbs_g": 2.17,
+        "protein_g": 2.98,
+        "fat_g": 1.59,
+        "sodium_mg": 151
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D106-284000000-0001",
+      "name": "부대찌개",
+      "category": "찌개 및 전골류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 123,
+        "carbs_g": 10.27,
+        "protein_g": 5.86,
+        "fat_g": 6.49,
+        "sodium_mg": 239
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "600g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D106-297000000-0001",
+      "name": "청국장찌개",
+      "category": "찌개 및 전골류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 47,
+        "carbs_g": 1.92,
+        "protein_g": 5.03,
+        "fat_g": 2.11,
+        "sodium_mg": 242
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D306-278000000-0002",
+      "name": "마라탕",
+      "category": "찌개 및 전골류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 66,
+        "carbs_g": 5.1,
+        "protein_g": 3.91,
+        "fat_g": 3.27,
+        "sodium_mg": 358
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D106-287180000-0001",
+      "name": "샤브샤브_소고기",
+      "category": "찌개 및 전골류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 43,
+        "carbs_g": 1.8,
+        "protein_g": 5.38,
+        "fat_g": 1.62,
+        "sodium_mg": 96
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "600g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D106-299000000-0001",
+      "name": "콩비지찌개",
+      "category": "찌개 및 전골류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 69,
+        "carbs_g": 3.57,
+        "protein_g": 6.74,
+        "fat_g": 3.08,
+        "sodium_mg": 289
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "400g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D106-274000000-0001",
+      "name": "돼지고기찌개",
+      "category": "찌개 및 전골류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 48,
+        "carbs_g": 2.26,
+        "protein_g": 6.25,
+        "fat_g": 1.51,
+        "sodium_mg": 255
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "300g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D105-223240000-0001",
+      "name": "미역국_소고기",
+      "category": "국 및 탕류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 13,
+        "carbs_g": 0.82,
+        "protein_g": 1.86,
+        "fat_g": 0.26,
+        "sodium_mg": 196
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "400g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D105-253000000-0001",
+      "name": "콩나물국",
+      "category": "국 및 탕류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 6,
+        "carbs_g": 0.61,
+        "protein_g": 0.74,
+        "fat_g": 0.09,
+        "sodium_mg": 219
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "400g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D105-226000000-0001",
+      "name": "북어국",
+      "category": "국 및 탕류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 28,
+        "carbs_g": 0.84,
+        "protein_g": 3.89,
+        "fat_g": 0.98,
+        "sodium_mg": 232
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "400g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D105-231000000-0001",
+      "name": "설렁탕",
+      "category": "국 및 탕류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 24,
+        "carbs_g": 0.36,
+        "protein_g": 4.26,
+        "fat_g": 0.58,
+        "sodium_mg": 22
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "500g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D105-199000000-0001",
+      "name": "갈비탕",
+      "category": "국 및 탕류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 54,
+        "carbs_g": 0.4,
+        "protein_g": 8.51,
+        "fat_g": 2.06,
+        "sodium_mg": 199
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "670g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D105-245000000-0001",
+      "name": "육개장",
+      "category": "국 및 탕류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 30,
+        "carbs_g": 1.49,
+        "protein_g": 3.68,
+        "fat_g": 0.99,
+        "sodium_mg": 201
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "440g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D105-228000000-0001",
+      "name": "삼계탕",
+      "category": "국 및 탕류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 101,
+        "carbs_g": 3.84,
+        "protein_g": 10.68,
+        "fat_g": 4.8,
+        "sodium_mg": 82
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "900g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D105-234000000-0001",
+      "name": "순대국",
+      "category": "국 및 탕류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 85,
+        "carbs_g": 14.95,
+        "protein_g": 2.35,
+        "fat_g": 1.75,
+        "sodium_mg": 330
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "600g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D110-465000000-0001",
+      "name": "돼지고기볶음(제육볶음)",
+      "category": "볶음류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 195,
+        "carbs_g": 4.73,
+        "protein_g": 12.15,
+        "fat_g": 14.19,
+        "sodium_mg": 501
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "250g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D110-462000000-0001",
+      "name": "닭볶음(닭갈비)",
+      "category": "볶음류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 186,
+        "carbs_g": 7.93,
+        "protein_g": 13.98,
+        "fat_g": 10.96,
+        "sodium_mg": 338
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "300g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D110-488000000-0001",
+      "name": "오징어볶음",
+      "category": "볶음류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 128,
+        "carbs_g": 7.43,
+        "protein_g": 9.85,
+        "fat_g": 6.52,
+        "sodium_mg": 310
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D310-466000000-0001",
+      "name": "두부김치",
+      "category": "볶음류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 115,
+        "carbs_g": 5.63,
+        "protein_g": 7.79,
+        "fat_g": 6.85,
+        "sodium_mg": 396
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "250g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D110-467000000-0001",
+      "name": "떡볶이",
+      "category": "볶음류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 144,
+        "carbs_g": 25.96,
+        "protein_g": 3.51,
+        "fat_g": 2.96,
+        "sodium_mg": 391
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "180g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D110-492000000-0001",
+      "name": "잡채",
+      "category": "볶음류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 146,
+        "carbs_g": 24.26,
+        "protein_g": 4.71,
+        "fat_g": 3.3,
+        "sodium_mg": 360
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D110-472000000-0001",
+      "name": "멸치볶음",
+      "category": "볶음류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 276,
+        "carbs_g": 13.62,
+        "protein_g": 39.44,
+        "fat_g": 7.08,
+        "sodium_mg": 2606
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "50g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D110-486000000-0001",
+      "name": "어묵볶음",
+      "category": "볶음류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 197,
+        "carbs_g": 24.33,
+        "protein_g": 8.41,
+        "fat_g": 7.29,
+        "sodium_mg": 818
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "140g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D110-456000000-0001",
+      "name": "김치볶음",
+      "category": "볶음류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 106,
+        "carbs_g": 7.27,
+        "protein_g": 1.38,
+        "fat_g": 7.94,
+        "sodium_mg": 521
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D110-481320000-0001",
+      "name": "소고기볶음_채소",
+      "category": "볶음류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 126,
+        "carbs_g": 6.44,
+        "protein_g": 12.8,
+        "fat_g": 5.4,
+        "sodium_mg": 269
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "230g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D108-365000000-0001",
+      "name": "닭구이",
+      "category": "구이류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 257,
+        "carbs_g": 7.8,
+        "protein_g": 26.21,
+        "fat_g": 13.39,
+        "sodium_mg": 751
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "340g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D108-386000000-0001",
+      "name": "소불고기",
+      "category": "구이류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 170,
+        "carbs_g": 4.26,
+        "protein_g": 16.41,
+        "fat_g": 9.66,
+        "sodium_mg": 418
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D108-382000000-0001",
+      "name": "삼겹살구이",
+      "category": "구이류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 467,
+        "carbs_g": 0.35,
+        "protein_g": 22.56,
+        "fat_g": 41.69,
+        "sodium_mg": 576
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D108-357110000-0001",
+      "name": "고등어구이_석쇠",
+      "category": "구이류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 340,
+        "carbs_g": 3.79,
+        "protein_g": 23.38,
+        "fat_g": 25.69,
+        "sodium_mg": 126
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D308-388000000-0001",
+      "name": "연어구이",
+      "category": "구이류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 234,
+        "carbs_g": 0.2,
+        "protein_g": 24.78,
+        "fat_g": 14.94,
+        "sodium_mg": 158
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D108-387140000-0001",
+      "name": "스테이크_소등심",
+      "category": "구이류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 194,
+        "carbs_g": 0.14,
+        "protein_g": 30.22,
+        "fat_g": 8.07,
+        "sodium_mg": 134
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D108-384000000-0001",
+      "name": "새우구이",
+      "category": "구이류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 145,
+        "carbs_g": 2.82,
+        "protein_g": 23.41,
+        "fat_g": 4.44,
+        "sodium_mg": 330
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "180g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D108-376000000-0001",
+      "name": "떡갈비",
+      "category": "구이류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 202,
+        "carbs_g": 2.46,
+        "protein_g": 21.38,
+        "fat_g": 11.82,
+        "sodium_mg": 404
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D108-352000000-0001",
+      "name": "가자미구이",
+      "category": "구이류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 123,
+        "carbs_g": 0.66,
+        "protein_g": 18.7,
+        "fat_g": 5.02,
+        "sodium_mg": 315
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D111-517000000-0001",
+      "name": "두부조림",
+      "category": "조림류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 143,
+        "carbs_g": 4.4,
+        "protein_g": 9.64,
+        "fat_g": 9.66,
+        "sodium_mg": 161
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "50g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D111-532080000-0001",
+      "name": "장조림_소고기",
+      "category": "조림류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 69,
+        "carbs_g": 4.84,
+        "protein_g": 10.41,
+        "fat_g": 0.86,
+        "sodium_mg": 543
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D111-509000000-0001",
+      "name": "고등어조림",
+      "category": "조림류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 141,
+        "carbs_g": 4.1,
+        "protein_g": 11.25,
+        "fat_g": 8.84,
+        "sodium_mg": 390
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D111-508000000-0001",
+      "name": "감자조림",
+      "category": "조림류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 114,
+        "carbs_g": 18.1,
+        "protein_g": 2.4,
+        "fat_g": 3.52,
+        "sodium_mg": 487
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "50g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D111-514000000-0001",
+      "name": "닭볶음탕",
+      "category": "조림류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 111,
+        "carbs_g": 8.52,
+        "protein_g": 11.91,
+        "fat_g": 3.22,
+        "sodium_mg": 376
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "300g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D303-148020000-0001",
+      "name": "라면_국물",
+      "category": "면 및 만두류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 19,
+        "carbs_g": 2.08,
+        "protein_g": 0.44,
+        "fat_g": 0.96,
+        "sodium_mg": 380
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "농촌진흥청(국가표준식품성분표)",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D303-148170000-0001",
+      "name": "라면_면",
+      "category": "면 및 만두류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 174,
+        "carbs_g": 29.79,
+        "protein_g": 3.89,
+        "fat_g": 4.37,
+        "sodium_mg": 278
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "농촌진흥청(국가표준식품성분표)",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D103-148090000-0001",
+      "name": "라면_달걀",
+      "category": "면 및 만두류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 108,
+        "carbs_g": 17.33,
+        "protein_g": 2.61,
+        "fat_g": 3.18,
+        "sodium_mg": 183
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "550g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D103-168000000-0001",
+      "name": "자장면",
+      "category": "면 및 만두류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 88,
+        "carbs_g": 14.37,
+        "protein_g": 2.69,
+        "fat_g": 2.22,
+        "sodium_mg": 307
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "600g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D103-172000000-0001",
+      "name": "짬뽕",
+      "category": "면 및 만두류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 58,
+        "carbs_g": 8.26,
+        "protein_g": 2.79,
+        "fat_g": 1.54,
+        "sodium_mg": 181
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "800g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D103-164400000-0001",
+      "name": "우동_일식",
+      "category": "면 및 만두류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 158,
+        "carbs_g": 30.48,
+        "protein_g": 1.78,
+        "fat_g": 3.22,
+        "sodium_mg": 157
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "800g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D103-174000000-0001",
+      "name": "칼국수",
+      "category": "면 및 만두류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 77,
+        "carbs_g": 14.9,
+        "protein_g": 3.3,
+        "fat_g": 0.49,
+        "sodium_mg": 220
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "700g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D303-161490000-0001",
+      "name": "스파게티_토마토소스",
+      "category": "면 및 만두류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 129,
+        "carbs_g": 18.64,
+        "protein_g": 4.87,
+        "fat_g": 3.83,
+        "sodium_mg": 302
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "500g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D103-150010000-0001",
+      "name": "만두_고기만두",
+      "category": "면 및 만두류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 159,
+        "carbs_g": 17.4,
+        "protein_g": 12.38,
+        "fat_g": 4.45,
+        "sodium_mg": 206
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "220g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D315-670000000-0001",
+      "name": "배추김치",
+      "category": "김치류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 38,
+        "carbs_g": 6.49,
+        "protein_g": 1.98,
+        "fat_g": 0.43,
+        "sodium_mg": 551
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "농촌진흥청(국가표준식품성분표)",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D115-665000000-0001",
+      "name": "깍두기",
+      "category": "김치류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 33,
+        "carbs_g": 4.24,
+        "protein_g": 1.56,
+        "fat_g": 1.06,
+        "sodium_mg": 808
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "50g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D315-675000000-0001",
+      "name": "열무김치",
+      "category": "김치류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 36,
+        "carbs_g": 5.87,
+        "protein_g": 2.39,
+        "fat_g": 0.38,
+        "sodium_mg": 583
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "농촌진흥청(국가표준식품성분표)",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D113-586000000-0001",
+      "name": "시금치나물",
+      "category": "나물·숙채류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 69,
+        "carbs_g": 3.36,
+        "protein_g": 3.74,
+        "fat_g": 4.46,
+        "sodium_mg": 136
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "50g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D113-597000000-0001",
+      "name": "콩나물무침",
+      "category": "나물·숙채류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 69,
+        "carbs_g": 3.2,
+        "protein_g": 3.86,
+        "fat_g": 4.54,
+        "sodium_mg": 387
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "50g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D114-645000000-0001",
+      "name": "오이생채",
+      "category": "생채·무침류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 69,
+        "carbs_g": 8.96,
+        "protein_g": 1.78,
+        "fat_g": 2.9,
+        "sodium_mg": 474
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "50g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D114-640320000-0001",
+      "name": "샐러드_채소",
+      "category": "생채·무침류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 145,
+        "carbs_g": 5.1,
+        "protein_g": 1.16,
+        "fat_g": 13.35,
+        "sodium_mg": 74
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "160g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D114-627000000-0001",
+      "name": "무생채",
+      "category": "생채·무침류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 49,
+        "carbs_g": 7.33,
+        "protein_g": 2.43,
+        "fat_g": 1.11,
+        "sodium_mg": 821
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "150g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D109-417000000-0001",
+      "name": "달걀부침(달걀후라이)",
+      "category": "전·적 및 부침류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 208,
+        "carbs_g": 5.15,
+        "protein_g": 15.73,
+        "fat_g": 13.78,
+        "sodium_mg": 161
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "60g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D109-416000000-0001",
+      "name": "달걀말이",
+      "category": "전·적 및 부침류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 193,
+        "carbs_g": 1.45,
+        "protein_g": 17.21,
+        "fat_g": 13.21,
+        "sodium_mg": 449
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D109-412000000-0001",
+      "name": "김치전",
+      "category": "전·적 및 부침류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 134,
+        "carbs_g": 19.01,
+        "protein_g": 5.05,
+        "fat_g": 4.2,
+        "sodium_mg": 240
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "150g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D109-419000000-0001",
+      "name": "두부부침",
+      "category": "전·적 및 부침류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 140,
+        "carbs_g": 2.07,
+        "protein_g": 10.92,
+        "fat_g": 9.77,
+        "sodium_mg": 429
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D312-550000000-0002",
+      "name": "돈가스",
+      "category": "튀김류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 280,
+        "carbs_g": 15.89,
+        "protein_g": 13.85,
+        "fat_g": 17.94,
+        "sodium_mg": 343
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D312-549000000-0001",
+      "name": "닭튀김",
+      "category": "튀김류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 301,
+        "carbs_g": 16.27,
+        "protein_g": 21.73,
+        "fat_g": 16.57,
+        "sodium_mg": 415
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "300g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D312-549160000-0001",
+      "name": "닭튀김_양념",
+      "category": "튀김류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 276,
+        "carbs_g": 21.15,
+        "protein_g": 17.75,
+        "fat_g": 13.4,
+        "sodium_mg": 403
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D112-537000000-0001",
+      "name": "감자튀김",
+      "category": "튀김류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 312,
+        "carbs_g": 35.15,
+        "protein_g": 4.55,
+        "fat_g": 17.01,
+        "sodium_mg": 78
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "150g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D112-566120000-0001",
+      "name": "탕수육_새우",
+      "category": "튀김류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 116,
+        "carbs_g": 13.02,
+        "protein_g": 6.65,
+        "fat_g": 4.2,
+        "sodium_mg": 492
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D312-559000000-0001",
+      "name": "생선까스",
+      "category": "튀김류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 327,
+        "carbs_g": 23.28,
+        "protein_g": 12.17,
+        "fat_g": 20.55,
+        "sodium_mg": 394
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D307-317040000-0001",
+      "name": "달걀찜_달걀만",
+      "category": "찜류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 108,
+        "carbs_g": 1.03,
+        "protein_g": 9.01,
+        "fat_g": 7.5,
+        "sodium_mg": 375
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D107-128180000-0001",
+      "name": "고구마_찐고구마",
+      "category": "찜류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 139,
+        "carbs_g": 32.47,
+        "protein_g": 1.67,
+        "fat_g": 0.24,
+        "sodium_mg": 10
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D107-307170000-0001",
+      "name": "감자_찐감자",
+      "category": "찜류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 70,
+        "carbs_g": 15.01,
+        "protein_g": 2.16,
+        "fat_g": 0.16,
+        "sodium_mg": 3
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D107-324000000-0001",
+      "name": "돼지갈비찜",
+      "category": "찜류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 194,
+        "carbs_g": 7.44,
+        "protein_g": 13.29,
+        "fat_g": 12.32,
+        "sodium_mg": 478
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "300g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D107-344000000-0001",
+      "name": "족발",
+      "category": "찜류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 233,
+        "carbs_g": 0.93,
+        "protein_g": 26.04,
+        "fat_g": 13.91,
+        "sodium_mg": 345
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "250g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D104-197000000-0001",
+      "name": "호박죽",
+      "category": "죽 및 스프류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 49,
+        "carbs_g": 6.58,
+        "protein_g": 1.93,
+        "fat_g": 1.71,
+        "sodium_mg": 42
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "400g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D304-186000000-0001",
+      "name": "쌀죽(흰죽)",
+      "category": "죽 및 스프류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 53,
+        "carbs_g": 11.45,
+        "protein_g": 0.99,
+        "fat_g": 0.15,
+        "sodium_mg": 0
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "농촌진흥청(국가표준식품성분표)",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D102-100000000-0001",
+      "name": "식빵",
+      "category": "빵 및 과자류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 264,
+        "carbs_g": 50.91,
+        "protein_g": 9.34,
+        "fat_g": 2.6,
+        "sodium_mg": 468
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D302-100380000-0001",
+      "name": "식빵_통밀식빵",
+      "category": "빵 및 과자류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 279,
+        "carbs_g": 48.64,
+        "protein_g": 9.33,
+        "fat_g": 5.26,
+        "sodium_mg": 660
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D102-096060000-0001",
+      "name": "샌드위치_닭가슴살",
+      "category": "빵 및 과자류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 240,
+        "carbs_g": 20.96,
+        "protein_g": 12.18,
+        "fat_g": 11.92,
+        "sodium_mg": 438
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "230g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D102-123000000-0001",
+      "name": "햄버거",
+      "category": "빵 및 과자류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 264,
+        "carbs_g": 21.67,
+        "protein_g": 12.85,
+        "fat_g": 13.98,
+        "sodium_mg": 450
+      },
+      "data_origin": "가정식(분석 함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D302-120340000-0001",
+      "name": "피자_치즈피자",
+      "category": "빵 및 과자류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 277,
+        "carbs_g": 35.6,
+        "protein_g": 15.7,
+        "fat_g": 7.9,
+        "sodium_mg": 475
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "200g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    },
+    {
+      "food_code": "D327-758010000-0001",
+      "name": "달걀_삶은것",
+      "category": "수·조·어·육류",
+      "nutrient_basis": {
+        "quantity": 100,
+        "unit": "g"
+      },
+      "per_100g": {
+        "kcal": 150,
+        "carbs_g": 0.63,
+        "protein_g": 12.8,
+        "fat_g": 10.65,
+        "sodium_mg": 127
+      },
+      "data_origin": "외식(분석함량)",
+      "data_method": "분석",
+      "source": "식품의약품안전처",
+      "food_weight_reference": "100g",
+      "source_url": "https://various.foodsafetykorea.go.kr/nutrient/general/down/list.do"
+    }
+  ]
+}

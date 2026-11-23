@@ -1,0 +1,40 @@
+name: NutriGap offline validation
+
+on:
+  push:
+    branches:
+      - feature/nutrigap-kfind-v1
+  pull_request:
+    branches:
+      - main
+      - feature/nutriagent-mvp
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nutriagent-offline-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python 3.11.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.9'
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Check dependencies
+        run: python -m pip check
+      - name: Compile Python
+        run: python -m compileall -q app.py agent.py nutrition.py nutrigap.py kfind_catalog.py scripts tests
+      - name: Run offline regression tests
+        env:
+          NUTRIAGENT_MODE: MOCK
+          NUTRIAGENT_LIVE_OLLAMA: '0'
+        run: python -m pytest -q -rs
