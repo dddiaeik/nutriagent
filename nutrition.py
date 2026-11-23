@@ -5,12 +5,16 @@ import math
 from dataclasses import dataclass
 from pathlib import Path
 
+from kfind_catalog import load_kfind_catalog
+
 DATA = Path(__file__).with_name("data")
 NUTRIENTS = ("kcal", "carbs_g", "protein_g", "fat_g")
 UNITS = ("g", "kg", "serving")
 SOURCE = "USDA National Nutrient Database for Standard Reference, Release 28"
 SOURCE_URL = "https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/sr28_doc.pdf"
 FOODS = json.loads((DATA / "foods.json").read_text(encoding="utf-8"))
+K_FIND_FOODS = load_kfind_catalog()
+ALL_FOODS = tuple(FOODS) + K_FIND_FOODS
 
 
 class InputError(ValueError):
@@ -38,9 +42,16 @@ def find_food(name: str) -> dict:
     if not isinstance(name, str) or not name.strip():
         raise InputError("음식 이름을 알려 주세요.")
     query = _normalize(name)
-    for food in FOODS:
-        if query in {_normalize(alias) for alias in (food["name"], *food["aliases"])}:
-            return food
+    # Prefer exact names from the Korean food database; then original USDA names,
+    # then aliases. This avoids silently mapping "쌀밥" to the USDA "흰쌀밥" alias.
+    for foods in (K_FIND_FOODS, FOODS):
+        for food in foods:
+            if query == _normalize(food["name"]):
+                return food
+    for foods in (FOODS, K_FIND_FOODS):
+        for food in foods:
+            if query in {_normalize(alias) for alias in food["aliases"]}:
+                return food
     raise InputError(f"'{name}'은 등록되지 않았습니다. 식품 목록에서 선택해 주세요.")
 
 
@@ -68,6 +79,8 @@ def calculate(items: list[dict]) -> Meal:
         unit = item.get("unit")
         if unit not in UNITS:
             raise InputError(f'{food["name"]}의 단위를 g, kg 또는 인분으로 알려 주세요.')
+        if unit == "serving" and food.get("serving_g") is None:
+            raise InputError(f'{food["name"]}의 1인분 중량은 검증되지 않았습니다. g 또는 kg으로 입력해주세요.')
         grams = quantity * {"g": 1, "kg": 1000, "serving": food["serving_g"]}[unit]
         nutrients = {key: food["per_100g"][key] * (grams / 100) for key in NUTRIENTS}
         lines.append(MealLine(food, grams, nutrients))
