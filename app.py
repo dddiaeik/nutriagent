@@ -87,8 +87,11 @@ with st.sidebar:
             else:
                 st.warning(f"{MODEL_NAME} 모델이 서버에 없습니다.")
     with st.expander("등록 식품"):
-        for food in ALL_FOODS:
-            st.write(f'{food["name"]} · {food["description"]}')
+        st.caption(f"조회 가능한 식품 데이터 {len(ALL_FOODS)}건 (USDA + K-FIND)")
+        st.dataframe(
+            [{"음식": f["name"], "출처": f.get("source_name", SOURCE)} for f in ALL_FOODS],
+            hide_index=True, height=260, use_container_width=True,
+        )
     st.subheader("비교 목표")
     goals = {
         key: st.number_input(label, min_value=0.01, value=None, step=1.0, key=f"goal-{key}")
