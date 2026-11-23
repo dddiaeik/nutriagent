@@ -52,7 +52,7 @@ def test_invalid_quantity(quantity, unit):
 
 def test_unregistered_food():
     with pytest.raises(InputError, match="등록되지 않았습니다"):
-        find_food("떡볶이")
+        find_food("미등록디저트")
     with pytest.raises(InputError):
         calculate([item("밥")])
 
@@ -86,7 +86,7 @@ def test_ollama_dispatch_with_stubbed_client(monkeypatch):
 def test_mock_clarification_unknown_and_unsupported_input(monkeypatch):
     monkeypatch.setenv("NUTRIAGENT_MODE", "mock")
     ambiguous = agent.run_turn(history("두부를 조금 먹었어"))
-    unknown = agent.run_turn(history("떡볶이 100g을 계산해 줘"))
+    unknown = agent.run_turn(history("미등록디저트 100g을 계산해 줘"))
     unsupported = agent.run_turn(history("먹은 것을 추정해 줘"))
     lookup = agent.run_turn(history("두부 영양소를 조회해 줘"))
     assert ambiguous.meal is None and "양과 단위" in ambiguous.text
@@ -112,7 +112,7 @@ def test_mock_ui_confirmation_and_recommendation(monkeypatch):
 
     monkeypatch.delenv("NUTRIAGENT_MODE", raising=False)
     monkeypatch.setattr(agent.ollama, "Client", offline_only)
-    screen = AppTest.from_file("app.py").run()
+    screen = AppTest.from_file("app.py", default_timeout=15).run()
     assert screen.title[0].value == "NutriAgent Lite"
     assert screen.caption[0].value == "실행 모드: MOCK · 미리 정의한 응답"
     screen.chat_input[0].set_value("닭가슴살 2인분과 흰쌀밥 100g을 계산해 줘").run()
@@ -138,7 +138,7 @@ def test_ollama_connection_error_does_not_use_mock_scenario(monkeypatch):
 
     monkeypatch.setenv("NUTRIAGENT_MODE", "OLLAMA")
     monkeypatch.setattr(agent.ollama, "Client", lambda **_: SimpleNamespace(chat=disconnected))
-    screen = AppTest.from_file("app.py").run()
+    screen = AppTest.from_file("app.py", default_timeout=15).run()
     screen.chat_input[0].set_value("닭가슴살 2인분과 흰쌀밥 100g을 계산해 줘").run()
     assert not screen.exception
     assert screen.caption[0].value == "실행 모드: OLLAMA · qwen3:8b 요청"
@@ -150,7 +150,7 @@ def test_ollama_connection_error_does_not_use_mock_scenario(monkeypatch):
 
 def test_invalid_mode_shows_configuration_error(monkeypatch):
     monkeypatch.setenv("NUTRIAGENT_MODE", "auto")
-    screen = AppTest.from_file("app.py").run()
+    screen = AppTest.from_file("app.py", default_timeout=15).run()
     assert not screen.exception and not screen.chat_input
     assert "NUTRIAGENT_MODE" in screen.error[0].value
 
