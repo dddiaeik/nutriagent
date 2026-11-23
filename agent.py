@@ -12,7 +12,7 @@ import httpx
 import ollama
 import pymupdf
 
-from nutrition import DATA, FOODS, InputError, Meal, calculate, find_food, replace_food
+from nutrition import DATA, FOODS, ALL_FOODS, InputError, Meal, calculate, find_food, replace_food
 
 MODEL_NAME = "qwen3:8b"
 PDF_PATH = DATA / "reference.pdf"
@@ -87,7 +87,7 @@ SYSTEM_PROMPT = """You interpret Korean or English requests for the NutriAgent L
 Use only the tools for lookups, calculations, recommendations, substitutions, and PDF searches.
 For intake, keep the user's actual foods and quantities. Never infer unknown foods, cooking methods,
 weights, or serving counts. '밥' alone is ambiguous, and units such as 그릇, 개, or '조금' need
-clarification. An explicitly stated 인분 is a serving (100 g in this demo). If food or amount is unclear
+clarification. An explicitly stated 인분 can be converted only for legacy USDA foods; for K-FIND foods ask grams. If food or amount is unclear
 call ask_clarification. Pass unregistered foods unchanged; never replace them with a similar food.
 Only propose amounts for recommendations, using foods from the catalog. For an explicit '대신'
 request with a previous meal, use replace_food, keeping each item's gram weight. No tool records intake;
@@ -109,8 +109,8 @@ MOCK_SCENARIOS = {
     "닭가슴살 대신 두부": ("replace_food", {"old_food": "닭가슴살", "new_food": "두부"}),
     "두부 영양소를 조회해 줘": ("find_food", {"name": "두부"}),
     "두부를 조금 먹었어": ("ask_clarification", {"missing": "quantity"}),
-    "떡볶이 100g을 계산해 줘": ("calculate_meal", {"items": [
-        {"food": "떡볶이", "quantity": 100, "unit": "g"},
+    "미등록디저트 100g을 계산해 줘": ("calculate_meal", {"items": [
+        {"food": "미등록디저트", "quantity": 100, "unit": "g"},
     ]}),
     "영양 가이드에서 whole grains를 검색해 줘": ("search_guidelines", {"query": "whole grains"}),
 }
@@ -201,7 +201,7 @@ def _execute(name, args, reply, previous_meal, pdf_path):
 def run_turn(history: list[dict], previous_meal: Meal | None = None, *,
              mode: Mode | None = None, goals: dict | None = None, pdf_path: Path = PDF_PATH) -> Reply:
     """Use tool calls as proposals; present only Python-verified results."""
-    catalog = ", ".join(food["name"] for food in FOODS)
+    catalog = ", ".join(food["name"] for food in ALL_FOODS)
     previous = [(line.food["name"], line.grams) for line in previous_meal.lines] if previous_meal else []
     context = f"Catalog: {catalog}. Previous meal (grams): {previous}. User goals: {goals or {}}."
     messages = [{"role": "system", "content": SYSTEM_PROMPT + "\n" + context}, *history]
