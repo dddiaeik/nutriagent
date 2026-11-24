@@ -1,0 +1,14 @@
+{
+  "baseline": {
+    "file": "tool_architecture_baseline_v1.json",
+    "version": "tool-architecture-baseline-v1",
+    "count": 15,
+    "sha256": "0222a3a36638d8f1245492714ab160e68bff2c05ac02cd60e92436281fb799c9"
+  },
+  "robustness": {
+    "file": "tool_architecture_robustness_v1.json",
+    "version": "tool-architecture-robustness-v1",
+    "count": 18,
+    "sha256": "fdb32e5d622d36d067eb66f3c6d68cef4bcd95704ea1acd04969fa1d02df4e58"
+  }
+}

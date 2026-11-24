@@ -11,7 +11,7 @@ import streamlit as st
 
 from agent import (
     MOCK_SCENARIOS, PDF_MIRROR_URL, PDF_PATH, PDF_TITLE, PDF_URL, Mode, configured_inference, configured_mode,
-    is_model_available, read_verified_pdf, run_turn,
+    configured_tool_architecture, is_model_available, read_verified_pdf, run_turn,
 )
 from nutrition import ALL_FOODS, FOODS, K_FIND_FOODS, SOURCE, SOURCE_URL, InputError, Meal, calculate, compare_goals
 from nutrigap import IntakeRecord, confirmed_totals
@@ -227,6 +227,7 @@ st.html(f"<style>{css}\n.st-key-nutriagent_header{{--na-mark:url(data:image/svg+
 try:
     mode = configured_mode()
     settings = configured_inference()
+    architecture = configured_tool_architecture()
 except ValueError as error:
     st.error(str(error))
     st.stop()
@@ -282,7 +283,8 @@ with st.container(horizontal_alignment="center"):
             ]
             history.append({"role": "user", "content": prompt})
             with st.spinner("요청을 해석하는 중…"):
-                reply = run_turn(history, previous, mode=mode, goals=goals, today_totals=totals, settings=settings)
+                reply = run_turn(history, previous, mode=mode, goals=goals, today_totals=totals,
+                                 settings=settings, architecture=architecture)
             turns.append((prompt, reply))
 
         if not turns:
