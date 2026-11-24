@@ -1,4 +1,4 @@
-# NutriAgent V1.4 · NutriGap
+# NutriAgent V1.4.1 · NutriGap
 
 Python이 등록 식품의 열량, 탄수화물, 단백질, 지방을 계산합니다. 두 실행 모드는 같은 식품 데이터, 계산 도구, 세션 기록을 사용합니다. 사용자가 화면에서 확정한 식단만 섭취 기록에 추가됩니다.
 
@@ -101,7 +101,7 @@ $env:NUTRIAGENT_MODEL = "qwen3.5:9b-q4_K_M"
 1. “김치찌개 200g과 쌀밥 150g을 먹었어.”를 입력하고 **오늘 섭취 기록에 추가**를 누릅니다. K-FIND 출처와 오늘 누적 371 kcal를 확인합니다. 빈 대화의 예시 버튼은 요청 문장을 입력창에 채웁니다.
 2. 오늘의 시연용 목표로 열량 820 kcal와 단백질 60g을 입력합니다. 입력하지 않은 탄수화물과 지방은 목표 비교에서 빠집니다.
 3. “오늘 목표에 맞춰 저녁을 추천해 줘”를 입력합니다. 닭가슴살과 잡곡밥 후보는 445 kcal로, 이 후보를 더했을 때 남는 열량은 449 kcal에서 4 kcal로 줄어듭니다.
-4. “닭가슴살 대신 두부”를 입력하면 기존 중량을 사용합니다. 추천을 다시 요청한 뒤 “닭가슴살 대신 두부 150g”을 입력하면 새 중량으로 대체합니다. 두 경우 모두 오늘 확정 기록은 371 kcal로 유지됩니다.
+4. 대체에는 이전 식단이 필요합니다. “닭가슴살 대신 두부”는 기존 중량을 유지하고, “닭가슴살 대신 두부 150g”은 두부의 새 총중량을 사용합니다. 기존 음식의 중량만 언급한 요청은 새 중량 지정으로 처리되지 않습니다. 중량이 모호하면 다시 묻습니다. 두 경우 모두 오늘 확정 기록은 371 kcal로 유지됩니다.
 5. 사이드바의 **오늘 기록 수정·철회**에서 중량을 바꾸거나 확정 기록을 철회합니다. 필요하면 **이전 대화 상세 보기**에서 오래된 후보의 표와 도구 로그를 다시 엽니다.
 6. “두부를 조금 먹었어”로 중량을 묻는 답변을 확인합니다. PDF가 준비되면 “영양 가이드에서 통곡물에 대해 찾아 줘.”를 입력해 원문 발췌, 발행처 링크, PDF 페이지를 확인합니다.
 
@@ -125,15 +125,40 @@ Invoke-WebRequest $pdf -OutFile data/reference.pdf
 Get-FileHash data/reference.pdf -Algorithm SHA256
 ```
 
-지원하는 사본의 SHA-256은 `c34f1bec5c9416265670b7fcb24556bb8616ba95e8de2f2890460b6bbca1a472`입니다. 검색 함수는 일치하는 사본만 발췌하고, 파일이 없거나 다른 문서이면 그 상태를 안내합니다. PDF와 개인 섭취 기록은 Git에 포함하지 않습니다.
+지원하는 사본의 SHA-256은 `c34f1bec5c9416265670b7fcb24556bb8616ba95e8de2f2890460b6bbca1a472`입니다. 사이드바 **시스템 정보**에서도 고정 커밋의 미러를 내려받을 수 있습니다. 검색 함수는 일치하는 사본만 발췌하고, 파일이 없거나 다른 문서이면 그 상태를 안내합니다. PDF와 개인 섭취 기록은 Git에 포함하지 않습니다. [검증된 PDF 미러 직접 다운로드](https://raw.githubusercontent.com/wachin/Dietary-Guidelines-for-Americans-2025-2030/e1d210fd1d709ee9d9893f12bbb77ea073512926/DGA.pdf)
 
 ## 테스트
 
 오프라인 자동 테스트는 `python -m pytest -q -rs`로 실행합니다. Windows에서는 `python` 대신 `.\.venv\Scripts\python.exe`를 사용할 수 있습니다. 이 테스트는 앱의 `MOCK` 응답과 모의 클라이언트를 사용한 `OLLAMA` 연결 실패 처리를 검증합니다.
 
-실제 모델 테스트는 서버가 준비된 뒤 별도로 실행합니다. Qwen3.5와 기본 Qwen3가 둘 다 설치되어 있으면 한국어 도구 선택, 인자 추출, 모호한 입력, K-FIND 인분, 대체 중량, 목표 추천을 같은 테스트 문장으로 비교합니다. 설치되지 않은 모델은 건너뛰며, 모델별·사례별 호출 지표를 JSON으로 출력합니다.
+실제 모델 테스트는 서버가 준비된 뒤 별도로 실행합니다. 두 모델에 기존 9개 사례와 대체 중량 사례 6개를 동일하게 적용합니다. 모델의 원본 도구 인수는 엄격하게 비교합니다. 실행 전에 보정된 인수는 로그의 `effective_input`에 표시하며, 보정해 올바른 결과를 얻어도 틀린 원본 호출을 통과시키지 않습니다.
 
 ```powershell
+$env:NUTRIAGENT_MODE = "OLLAMA"
 $env:NUTRIAGENT_LIVE_OLLAMA = "1"
-.\.venv\Scripts\python.exe -m pytest -q -rs -s -k live_qwen_inference
+1..3 | ForEach-Object {
+    .\.venv\Scripts\python.exe -m pytest -q -rs -s -k live_qwen_inference |
+        Tee-Object -FilePath (Join-Path $env:TEMP "nutriagent-v1.4.1-run-$_.log")
+}
+ollama ps
 ```
+
+V1.4와 성능을 비교하려면 같은 PC와 추론 설정에서 아래 명령으로 기준 커밋을 임시 폴더에 펼쳐 같은 평가를 세 번 실행합니다. 현재 브랜치는 전환하지 않습니다.
+
+```powershell
+$python = (Resolve-Path .\.venv\Scripts\python.exe).Path
+$baseline = Join-Path $env:TEMP ("nutriagent-v1.4-" + [guid]::NewGuid())
+git archive --format=zip --output="$baseline.zip" 5da5c350bc015d37293aaff0ca5750a2725627c8
+Expand-Archive "$baseline.zip" $baseline
+Push-Location $baseline
+try {
+    1..3 | ForEach-Object {
+        & $python -m pytest -q -rs -s -k live_qwen_inference |
+            Tee-Object -FilePath (Join-Path $env:TEMP "nutriagent-v1.4-run-$_.log")
+    }
+} finally {
+    Pop-Location
+}
+```
+
+두 버전에서 공통인 9개 사례만 모델별로 비교합니다. 각 로그의 `calls[].prompt_tokens` 합계와 `agent_ms`로 입력 토큰 수와 Agent 처리 시간을 비교하고, 모델 로딩 시간이 포함된 실행은 `calls[].load_ms`로 구분합니다. 설치되지 않은 모델의 평가 결과는 건너뜁니다.

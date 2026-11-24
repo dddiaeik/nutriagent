@@ -10,7 +10,7 @@ import ollama
 import streamlit as st
 
 from agent import (
-    MOCK_SCENARIOS, PDF_PATH, PDF_TITLE, PDF_URL, Mode, configured_inference, configured_mode,
+    MOCK_SCENARIOS, PDF_MIRROR_URL, PDF_PATH, PDF_TITLE, PDF_URL, Mode, configured_inference, configured_mode,
     is_model_available, read_verified_pdf, run_turn,
 )
 from nutrition import ALL_FOODS, FOODS, K_FIND_FOODS, SOURCE, SOURCE_URL, InputError, Meal, calculate, compare_goals
@@ -27,7 +27,7 @@ CHAT_KEY = "nutriagent_chat"
 EXAMPLES = (
     ("음식 영양소 계산하기", ":material/restaurant:", "김치찌개 200g과 쌀밥 150g을 먹었어."),
     ("오늘 목표에 맞춰 추천받기", ":material/track_changes:", "오늘 남은 영양 목표에 맞춰 저녁을 추천해 줘."),
-    ("음식과 중량 바꾸기", ":material/swap_horiz:", "닭가슴살 대신 두부 150g으로 바꿔 줘."),
+    ("음식과 중량 바꾸기 (이전 식단 필요)", ":material/swap_horiz:", "닭가슴살 대신 두부 150g으로 바꿔 줘."),
     ("영양 가이드 검색하기", ":material/menu_book:", "영양 가이드에서 통곡물에 대해 찾아 줘."),
 )
 
@@ -193,6 +193,7 @@ def render_system(mode, model):
         else:
             pdf_status = pdf_integrity(PDF_PATH, (stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns))
         st.write(f"영양 가이드 PDF · {pdf_status}")
+        st.caption(f"[검증된 PDF 미러에서 내려받기]({PDF_MIRROR_URL})")
         st.caption(f"USDA {len(FOODS)}종 · K-FIND {len(K_FIND_FOODS)}종")
     with st.expander("등록 식품"):
         st.caption("K-FIND 식품의 중량은 g 또는 kg으로 입력합니다.")

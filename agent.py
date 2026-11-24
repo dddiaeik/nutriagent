@@ -21,6 +21,8 @@ MODEL_NAME = "qwen3:8b"
 PDF_PATH = DATA / "reference.pdf"
 PDF_TITLE = "USDA/HHS Dietary Guidelines for Americans, 2025–2030"
 PDF_URL = "https://cdn.realfood.gov/DGA.pdf"
+PDF_MIRROR_URL = ("https://raw.githubusercontent.com/wachin/Dietary-Guidelines-for-Americans-2025-2030/"
+                  "e1d210fd1d709ee9d9893f12bbb77ea073512926/DGA.pdf")
 PDF_SHA256 = "c34f1bec5c9416265670b7fcb24556bb8616ba95e8de2f2890460b6bbca1a472"
 GUIDELINE_KEYWORDS = {
     "통곡물": "whole grains",
@@ -112,6 +114,15 @@ def _tool(name, description, properties, *, optional=()):
 TEXT = {"type": "string"}
 QUANTITY = {"type": "number", "description": "The stated numeric quantity."}
 UNIT = {"type": "string", "enum": ["g", "kg", "serving"]}
+REPLACEMENT_QUESTION = "대체 음식의 새 중량을 숫자와 단위로 알려 주세요. 기존 중량을 유지하려면 같은 양이라고 알려 주세요."
+WEIGHT_UNIT = r"킬로그램|그램|kilograms?\b|grams?\b|kg(?![a-z])|g(?![a-z])|인분|servings?\b"
+WEIGHT = (r"(?<![\d.,])(?P<quantity>[+-]?(?:(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|\.\d+))\s*"
+          rf"(?P<unit>{WEIGHT_UNIT})")
+WEIGHT_UNITS = {"킬로그램": "kg", "그램": "g", "kilogram": "kg", "kilograms": "kg",
+                "gram": "g", "grams": "g", "인분": "serving", "servings": "serving"}
+UNCERTAIN_WEIGHT = re.compile(r"\d|조금|적당|얼마나|한\s*그릇|그램|인분|\b(?:some|a little|half|grams?|servings?)\b",
+                              re.IGNORECASE)
+WEIGHT_RANGE = re.compile(rf"\d\s*(?:{WEIGHT_UNIT})?\s*(?:[~–-]|에서|또는|이나|or)\s*\d", re.IGNORECASE)
 ITEMS = {
     "type": "array",
     "items": {
@@ -134,10 +145,14 @@ TOOLS = [
     _tool("calculate_meal", "명시된 음식·수량·단위로 섭취 영양 계산.", {"items": ITEMS}),
     _tool("recommend_meal", "사용자가 지정한 음식으로 구성한 후보 계산.", {"items": ITEMS}),
     _tool("recommend_for_goals", "오늘 목표 또는 남은 섭취량에 맞춘 저녁 추천. 인자 없음.", {}),
-    _tool("replace_food", "직전 식단의 음식 대체. 새 수량과 단위가 명시되면 둘 다 전달.", {
-        "old_food": TEXT, "new_food": TEXT, "quantity": QUANTITY, "unit": UNIT,
+    _tool("replace_food", "음식 대체. 새 음식의 양을 사용자가 지정한 경우에만 quantity와 unit을 함께 입력. "
+          "그 외에는 둘 다 생략하고 Python이 기존 중량 유지. 기존 중량 복사 금지.", {
+        "old_food": TEXT,
+        "new_food": TEXT,
+        "quantity": {**QUANTITY, "description": "새 음식에 명시한 수량만 입력. 기존 음식의 수량은 생략."},
+        "unit": {**UNIT, "description": "새 음식에 명시한 단위만 입력. quantity가 없으면 생략."},
     }, optional=("quantity", "unit")),
-    _tool("search_guidelines", "영양 기준 PDF를 짧은 영문 키워드로 검색.", {"query": TEXT}),
+    _tool("search_guidelines", "영양 기준 PDF 검색. 영어 또는 " + "·".join(GUIDELINE_KEYWORDS) + ".", {"query": TEXT}),
     _tool("ask_clarification", "음식·양·기준 식단이 모호할 때 추가 질문.", {
         "missing": {"type": "string", "enum": list(QUESTIONS)},
     }),
@@ -147,7 +162,8 @@ SYSTEM_PROMPT = """한국어·영어 요청의 의도를 파악해 도구를 호
 음식명·조리법·수량·단위를 보존하세요. 미등록 음식도 이름 그대로 전달하고 유사 식품으로 바꾸지 마세요.
 섭취 계산에서 '밥', '한 그릇', '조금'처럼 정보가 모호하면 ask_clarification. 명시된 인분은 serving으로 전달하면 Python이 검증하며, K-FIND는 g 또는 kg이 필요합니다.
 오늘 목표/남은 영양/저녁 추천은 recommend_for_goals로 요청하세요. Python이 후보와 중량을 정합니다. 지정 음식으로 후보를 요청한 경우에만 recommend_meal을 쓰고 후보 중량을 제안할 수 있습니다.
-'대신'은 replace_food로 처리하세요. 사용자가 새 중량을 지정한 경우에만 quantity와 unit을 전달하세요.
+'대신'은 replace_food를 호출하세요. 새 음식의 중량을 명시하지 않으면 quantity와 unit을 모두 생략하세요. 이전 음식 중량을 복사하지 마세요. 중량 유지는 Python이 처리합니다.
+예: '연어 120g 대신 달걀' → old_food, new_food만. '연어 대신 달걀 90g' → quantity=90, unit=g도 전달. 새 중량이 모호하면 ask_clarification.
 어떤 도구도 실제 섭취 기록을 확정하지 않습니다.
 """
 
@@ -285,6 +301,51 @@ class Reply:
     agent_ms: float | None = None
 
 
+def _named_weights(food):
+    name = re.escape(food.strip())
+    particle = r"(?:으로|로|을|를|은|는|도)?"
+    return (rf"(?<![가-힣a-z]){name}{particle}\s*(?:\(\s*|총\s*)?{WEIGHT}",
+            rf"{WEIGHT}\s*(?:의\s*|짜리\s*|of\s+)?{name}{particle}(?![가-힣a-z])")
+
+
+def _replacement_arguments(history, args):
+    """Ground an override in the user's words, never in the prior meal or model's quantity."""
+    users = [message["content"] for message in history if message["role"] == "user"]
+    request = users[-1] if users else ""
+    target = request
+    if "대신" in request:
+        target = request.split("대신", 1)[1]
+    elif re.search(r"\binstead of\b", request, re.IGNORECASE):
+        target = re.split(r"\binstead of\b", request, maxsplit=1, flags=re.IGNORECASE)[0]
+    elif re.search(r"\b(?:replace|swap)\b", request, re.IGNORECASE):
+        target = re.split(r"\b(?:with|for)\b", request, maxsplit=1, flags=re.IGNORECASE)[-1]
+
+    effective = {key: value for key, value in args.items() if key not in {"quantity", "unit"}}
+    new_food = args.get("new_food")
+    if not isinstance(new_food, str) or not new_food.strip():
+        return effective  # Let the existing food validation report the missing name.
+    old_food = args.get("old_food")
+    if target == request and isinstance(old_food, str) and old_food.strip() and old_food != new_food:
+        for pattern in _named_weights(old_food):
+            target = re.sub(pattern, " ", target, flags=re.IGNORECASE)
+    mentions = list(re.finditer(WEIGHT, target, re.IGNORECASE))
+    matches = {match.span("quantity"): match for pattern in _named_weights(new_food)
+               for match in re.finditer(pattern, target, re.IGNORECASE)}
+    followup = (len(users) > 1 and len(history) >= 3 and history[-2]["role"] == "assistant"
+                and history[-2]["content"] in {REPLACEMENT_QUESTION, QUESTIONS["quantity"]})
+    if not matches and followup and re.fullmatch(rf"\s*{WEIGHT}(?:이야|으로|로|입니다)?[.!]?\s*",
+                                               target, re.IGNORECASE):
+        matches = {mentions[0].span("quantity"): mentions[0]}
+
+    if len(matches) == 1 and len(mentions) == 1 and not WEIGHT_RANGE.search(target):
+        match = next(iter(matches.values()))
+        unit = match["unit"].lower()
+        return {**effective, "quantity": float(match["quantity"].replace(",", "")), "unit": WEIGHT_UNITS.get(unit, unit)}
+    if UNCERTAIN_WEIGHT.search(re.sub(re.escape(new_food.strip()), "", target, flags=re.IGNORECASE)):
+        raise InputError(REPLACEMENT_QUESTION)
+    return effective
+
+
 def _execute(name, args, reply, previous_meal, pdf_path, today_totals, goals):
     match name:
         case "find_food":
@@ -340,13 +401,13 @@ def run_turn(history: list[dict], previous_meal: Meal | None = None, *,
         system += f"직전 식단: {previous}"
     messages = [{"role": "system", "content": system}, *history]
     totals = today_totals if today_totals is not None else dict.fromkeys(NUTRIENTS, 0.0)
-    reply = _run_tools(messages, previous_meal, pdf_path, totals, goals or {}, mode, settings, client)
+    reply = _run_tools(messages, history, previous_meal, pdf_path, totals, goals or {}, mode, settings, client)
     if client is not None:
         reply.agent_ms = (perf_counter_ns() - start) / 1_000_000
     return reply
 
 
-def _run_tools(messages, previous_meal, pdf_path, today_totals, goals, mode, settings, client):
+def _run_tools(messages, history, previous_meal, pdf_path, today_totals, goals, mode, settings, client):
     reply = Reply(mode, model=settings.model)
     if mode == Mode.MOCK:
         reply.text = "등록된 MOCK 예시를 입력해 주세요. 화면의 예시 목록에서 복사할 수 있습니다."
@@ -372,13 +433,17 @@ def _run_tools(messages, previous_meal, pdf_path, today_totals, goals, mode, set
         messages.append(message)
         for call in message.tool_calls:
             name, args = call.function.name, call.function.arguments
+            log_entry = {"tool": name, "input": args}
             try:
-                result = _execute(name, args, reply, previous_meal, pdf_path, today_totals, goals)
+                effective = _replacement_arguments(history, args) if name == "replace_food" and previous_meal else args
+                if effective != args:
+                    log_entry["effective_input"] = effective
+                result = _execute(name, effective, reply, previous_meal, pdf_path, today_totals, goals)
             except InputError as error:
-                reply.tool_log.append({"tool": name, "input": args, "status": str(error)})
+                reply.tool_log.append({**log_entry, "status": str(error)})
                 return Reply(mode, model=settings.model, inference=reply.inference, text=str(error),
                              needs_clarification=True, tool_log=reply.tool_log)
-            reply.tool_log.append({"tool": name, "input": args, "status": "완료"})
+            reply.tool_log.append({**log_entry, "status": "완료"})
             if reply.meal is not None or name in ("search_guidelines", "recommend_for_goals"):
                 return reply
             messages.append({"role": "tool", "tool_name": name, "content": json.dumps(result, ensure_ascii=False)})
