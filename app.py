@@ -1,5 +1,6 @@
 """Streamlit chat for the NutriAgent Lite demo."""
 
+from dataclasses import asdict
 from datetime import date
 
 import httpx
@@ -7,13 +8,12 @@ import ollama
 import streamlit as st
 
 from agent import (
-    MOCK_SCENARIOS, MODEL_NAME, PDF_TITLE, PDF_URL, Mode, configured_mode, is_model_available, run_turn,
+    MOCK_SCENARIOS, PDF_TITLE, PDF_URL, Mode, configured_inference, configured_mode, is_model_available, run_turn,
 )
 from nutrition import ALL_FOODS, SOURCE, SOURCE_URL, InputError, Meal, calculate, compare_goals
 from nutrigap import IntakeRecord, confirmed_totals, goal_gap
 
 LABELS = {"kcal": "열량 (kcal)", "carbs_g": "탄수화물 (g)", "protein_g": "단백질 (g)", "fat_g": "지방 (g)"}
-MODE_LABELS = {Mode.MOCK: "MOCK · 미리 정의한 응답", Mode.OLLAMA: f"OLLAMA · {MODEL_NAME} 요청"}
 RECENT_DETAILS = 3
 
 
@@ -21,8 +21,12 @@ def nutrient_row(values):
     return {LABELS[key]: round(value) for key, value in values.items()}
 
 
+def mode_label(mode, model):
+    return f"OLLAMA · {model} 요청" if mode == Mode.OLLAMA else "MOCK · 미리 정의한 응답"
+
+
 def render_reply(reply, turn_id, goals, records, today, *, detailed):
-    st.caption(MODE_LABELS[reply.mode])
+    st.caption(mode_label(reply.mode, reply.model))
     st.write(reply.text)
     if reply.food:
         food = reply.food
@@ -82,6 +86,13 @@ def render_reply(reply, turn_id, goals, records, today, *, detailed):
         if reply.tool_log:
             with st.expander("도구 실행 로그"):
                 st.json(reply.tool_log)
+        if reply.agent_ms is not None:
+            with st.expander("Ollama 추론 지표"):
+                st.caption(f"Agent 전체 응답 시간 {reply.agent_ms:.2f} ms")
+                if reply.inference:
+                    st.json([asdict(call) for call in reply.inference])
+                else:
+                    st.caption("Ollama 응답 지표를 받지 못했습니다.")
 
 
 def edit_today_record(records, active_ids, today):
@@ -119,13 +130,15 @@ st.set_page_config(page_title="NutriAgent Lite")
 st.title("NutriAgent Lite")
 try:
     mode = configured_mode()
+    settings = configured_inference()
 except ValueError as error:
     st.error(str(error))
     st.stop()
-st.caption(f"실행 모드: {MODE_LABELS[mode]}")
+st.caption(f"실행 모드: {mode_label(mode, settings.model)}")
 st.caption("USDA 12종 + K-FIND 98종. K-FIND 음식의 1인분 중량은 미확인으로 g 또는 kg으로 입력합니다.")
 
 if mode == Mode.MOCK:
+    st.caption(f"설정된 Ollama 모델: {settings.model}")
     with st.expander("MOCK 예시 문장"):
         st.code("\n".join(MOCK_SCENARIOS), language="text")
 
@@ -143,16 +156,16 @@ totals = confirmed_totals(records.values(), today)
 active_ids = [index for index, record in records.items() if record.day == today and record.meal is not None]
 
 with st.sidebar:
-    if mode == Mode.OLLAMA and st.button(f"Ollama 모델 확인 ({MODEL_NAME})"):
+    if mode == Mode.OLLAMA and st.button(f"Ollama 모델 확인 ({settings.model})"):
         try:
-            installed = is_model_available()
+            installed = is_model_available(settings.model)
         except (ConnectionError, httpx.RequestError, ollama.ResponseError):
             st.error("Ollama 서버에서 모델 목록을 가져올 수 없습니다.")
         else:
             if installed:
-                st.success(f"{MODEL_NAME} 모델이 서버에 설치되어 있습니다.")
+                st.success(f"{settings.model} 모델이 서버에 설치되어 있습니다.")
             else:
-                st.warning(f"{MODEL_NAME} 모델이 서버에 없습니다.")
+                st.warning(f"{settings.model} 모델이 서버에 없습니다.")
     with st.expander("등록 식품"):
         st.caption(f"조회 가능한 식품 데이터 {len(ALL_FOODS)}건 (USDA + K-FIND)")
         st.dataframe(
@@ -177,14 +190,15 @@ with st.sidebar:
 prompt = st.chat_input("예: 닭가슴살 2인분과 흰쌀밥 100g을 계산해 줘")
 if prompt:
     previous = next((reply.meal for _, reply in reversed(turns) if reply.meal), None)
+    recent = turns[-5:] if turns and turns[-1][1].needs_clarification else turns[-1:]
     history = [
         message
-        for question, reply in turns[-5:]
+        for question, reply in recent
         for message in ({"role": "user", "content": question}, {"role": "assistant", "content": reply.text})
     ]
     history.append({"role": "user", "content": prompt})
     with st.spinner("요청을 해석하는 중…"):
-        reply = run_turn(history, previous, mode=mode, goals=goals, today_totals=totals)
+        reply = run_turn(history, previous, mode=mode, goals=goals, today_totals=totals, settings=settings)
     turns.append((prompt, reply))
 
 summary_count = max(0, len(turns) - RECENT_DETAILS)

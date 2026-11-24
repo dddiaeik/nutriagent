@@ -99,17 +99,25 @@ def compare_goals(totals: dict, goals: dict) -> dict:
     }
 
 
-def replace_food(meal: Meal, old_food: str, new_food: str) -> Meal:
+def replace_food(meal: Meal, old_food: str, new_food: str, *, quantity=None, unit=None) -> Meal:
     old = find_food(old_food)
     new = find_food(new_food)
-    if not any(line.food["ndb"] == old["ndb"] for line in meal.lines):
+    if (quantity is None) != (unit is None):
+        raise InputError("대체 음식의 수량과 단위를 함께 알려 주세요.")
+    items = []
+    found = False
+    for line in meal.lines:
+        if line.food["ndb"] != old["ndb"]:
+            items.append({"food": line.food["name"], "quantity": line.grams, "unit": "g"})
+            continue
+        if quantity is not None and found:
+            continue
+        items.append({
+            "food": new["name"],
+            "quantity": line.grams if quantity is None else quantity,
+            "unit": "g" if quantity is None else unit,
+        })
+        found = True
+    if not found:
         raise InputError(f'이전 식단에 {old["name"]}이(가) 없습니다.')
-    items = [
-        {
-            "food": new["name"] if line.food["ndb"] == old["ndb"] else line.food["name"],
-            "quantity": line.grams,
-            "unit": "g",
-        }
-        for line in meal.lines
-    ]
     return calculate(items)

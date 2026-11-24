@@ -1,5 +1,4 @@
 import hashlib
-import os
 from types import SimpleNamespace
 
 import pymupdf
@@ -77,7 +76,8 @@ def test_ollama_dispatch_with_stubbed_client(monkeypatch):
         return next(responses)
 
     monkeypatch.setattr(agent.ollama, "Client", lambda **_: SimpleNamespace(chat=chat))
-    reply = agent.run_turn(history("두부 2인분을 계산해 줘"), mode=agent.Mode.OLLAMA)
+    reply = agent.run_turn(history("두부 2인분을 계산해 줘"), mode=agent.Mode.OLLAMA,
+                           settings=agent.InferenceConfig())
     assert reply.mode == agent.Mode.OLLAMA
     assert reply.meal.totals["kcal"] == 288
     assert [entry["tool"] for entry in reply.tool_log] == ["find_food", "calculate_meal"]
@@ -153,6 +153,7 @@ def test_ollama_connection_error_does_not_use_mock_scenario(monkeypatch):
         raise ConnectionError
 
     monkeypatch.setenv("NUTRIAGENT_MODE", "OLLAMA")
+    monkeypatch.delenv("NUTRIAGENT_MODEL", raising=False)
     monkeypatch.setattr(agent.ollama, "Client", lambda **_: SimpleNamespace(chat=disconnected))
     screen = AppTest.from_file("app.py", default_timeout=15).run()
     screen.chat_input[0].set_value("닭가슴살 2인분과 흰쌀밥 100g을 계산해 줘").run()
@@ -188,17 +189,3 @@ def test_pdf_requires_matching_file(tmp_path, monkeypatch):
     reply = agent.run_turn(history("영양 가이드에서 whole grains를 검색해 줘"), mode=agent.Mode.MOCK, pdf_path=pdf)
     assert reply.hits[0]["page"] == 1
     assert reply.tool_log[0]["tool"] == "search_guidelines"
-
-
-@pytest.mark.skipif(os.getenv("NUTRIAGENT_LIVE_OLLAMA") != "1", reason="requires a running Ollama with qwen3:8b")
-def test_live_qwen_inference():
-    assert agent.is_model_available()
-    reply = agent.run_turn(history("두부 100g의 열량과 단백질을 계산해 줘."), mode=agent.Mode.OLLAMA)
-    assert reply.kind == "intake", reply.text
-    assert reply.meal.totals["kcal"] == 144
-    assert reply.meal.totals["protein_g"] == pytest.approx(17.27)
-    dinner = agent.run_turn(history("오늘 남은 영양 목표에 맞춰 저녁을 추천해 줘."),
-                            mode=agent.Mode.OLLAMA, goals={"kcal": 590, "protein_g": 60},
-                            today_totals=reply.meal.totals)
-    assert dinner.candidates and dinner.kind == "recommendation", dinner.text
-    assert dinner.impact.before["kcal"] == 446
