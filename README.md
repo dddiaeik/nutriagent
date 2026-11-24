@@ -1,4 +1,4 @@
-# NutriAgent V1.3 · NutriGap
+# NutriAgent V1.4 · NutriGap
 
 Python이 등록 식품의 열량, 탄수화물, 단백질, 지방을 계산합니다. 두 실행 모드는 같은 식품 데이터, 계산 도구, 세션 기록을 사용합니다. 사용자가 화면에서 확정한 식단만 섭취 기록에 추가됩니다.
 
@@ -8,6 +8,10 @@ Python이 등록 식품의 열량, 탄수화물, 단백질, 지방을 계산합�
 | `OLLAMA` | Windows RTX 2080 SUPER에서 최종 시연 | 선택한 모델이 요청을 해석하고 도구를 호출. 기본 `qwen3:8b` |
 
 화면은 실행 모드와 각 응답의 출처를 표시합니다. Ollama 요청이 실패하면 연결 또는 모델 상태를 확인하라는 안내를 표시합니다.
+
+사이드바의 목표 카드에서 확정 섭취량, 목표량, 남은 양이나 초과량, 달성률을 확인합니다. 식사 계산 후 **오늘 섭취 기록에 추가**를 눌러야 합계에 반영됩니다. 기록 수정과 철회도 사이드바에서 할 수 있습니다. **시스템 정보**에서 모델 연결을 직접 확인하고 영양 가이드 PDF의 무결성과 등록 식품 수를 볼 수 있습니다.
+
+[UI 디자인](docs/UI_DESIGN_V1_4.md) · [V1.4 검증 기록](docs/VALIDATION_V1_4.md)
 
 ## NutriGap K-FIND 한국 음식 확장 (개선 브랜치)
 
@@ -51,7 +55,7 @@ Windows 10 22H2 이상에서 Python 3.11.9와 Windows용 Ollama를 설치합니�
 새 PowerShell에서 저장소를 복제하고 패키지를 설치합니다. `py -3.11 --version` 출력이 `Python 3.11.9`인지 확인합니다.
 
 ```powershell
-git clone --branch feature/qwen35-agent-optimization-v1 https://github.com/dddiaeik/nutriagent.git
+git clone --branch feature/nutriagent-ui-branding-v1 https://github.com/dddiaeik/nutriagent.git
 Set-Location nutriagent
 py -3.11 --version
 py -3.11 -m venv .venv
@@ -94,25 +98,32 @@ $env:NUTRIAGENT_MODEL = "qwen3.5:9b-q4_K_M"
 
 ## 시연 순서
 
-1. “김치찌개 200g과 쌀밥 150g을 계산해 줘”를 입력하고 **이 식단을 섭취 기록에 추가**를 누릅니다. K-FIND 출처와 오늘 누적 371 kcal를 확인합니다.
+1. “김치찌개 200g과 쌀밥 150g을 먹었어.”를 입력하고 **오늘 섭취 기록에 추가**를 누릅니다. K-FIND 출처와 오늘 누적 371 kcal를 확인합니다. 빈 대화의 예시 버튼은 요청 문장을 입력창에 채웁니다.
 2. 오늘의 시연용 목표로 열량 820 kcal와 단백질 60g을 입력합니다. 입력하지 않은 탄수화물과 지방은 목표 비교에서 빠집니다.
 3. “오늘 목표에 맞춰 저녁을 추천해 줘”를 입력합니다. 닭가슴살과 잡곡밥 후보는 445 kcal로, 이 후보를 더했을 때 남는 열량은 449 kcal에서 4 kcal로 줄어듭니다.
 4. “닭가슴살 대신 두부”를 입력하면 기존 중량을 사용합니다. 추천을 다시 요청한 뒤 “닭가슴살 대신 두부 150g”을 입력하면 새 중량으로 대체합니다. 두 경우 모두 오늘 확정 기록은 371 kcal로 유지됩니다.
 5. 사이드바의 **오늘 기록 수정·철회**에서 중량을 바꾸거나 확정 기록을 철회합니다. 필요하면 **이전 대화 상세 보기**에서 오래된 후보의 표와 도구 로그를 다시 엽니다.
-6. 아래 PDF를 준비한 경우 “영양 가이드에서 whole grains를 검색해 줘”를 입력해 원문 발췌와 PDF 페이지를 확인합니다.
+6. “두부를 조금 먹었어”로 중량을 묻는 답변을 확인합니다. PDF가 준비되면 “영양 가이드에서 통곡물에 대해 찾아 줘.”를 입력해 원문 발췌, 발행처 링크, PDF 페이지를 확인합니다.
 
 ## 식품 데이터와 PDF
 
 `data/foods.json`은 USDA National Nutrient Database for Standard Reference Release 28의 12개 식품을 담습니다. NDB 번호와 원문 식품 설명으로 조리 상태를 확인할 수 있습니다. `FOOD_DES.txt`의 식품 정보와 `NUT_DATA.txt`의 영양소 코드 208·205·203·204를 연결했습니다. 원자료의 100g당 값을 사용하며, 100g 인분은 앱의 시연 기준입니다. [USDA 원자료 설명서](https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/sr28_doc.pdf) · [검증에 사용한 SR28 원자료 미러](https://github.com/alyssaq/usda-sqlite/tree/1e457b599af101ce463a195867574eba16c81acb/data)
 
-PDF 검색은 USDA/HHS의 *Dietary Guidelines for Americans, 2025–2030* 영어판 한 개를 대상으로 합니다. 영문 키워드가 나오는 PDF 페이지를 최대 3개까지 보여 줍니다. 클라우드의 발행처 접근이 차단되어 GitHub 미러 사본에서 검색과 페이지를 검증했습니다. [발행처 PDF](https://cdn.realfood.gov/DGA.pdf) · [검증에 사용한 미러 사본](https://github.com/wachin/Dietary-Guidelines-for-Americans-2025-2030/blob/e1d210fd1d709ee9d9893f12bbb77ea073512926/DGA.pdf)
+PDF 검색은 USDA/HHS의 *Dietary Guidelines for Americans, 2025–2030* 영어판에서 키워드와 일치하는 원문 발췌를 최대 3개 표시합니다. 문장 경계를 확인하기 어려운 경우 추출한 문단이나 제목을 그대로 표시합니다. 통곡물, 단백질, 식이섬유, 첨가당, 건강한 지방은 영어 검색어에 대응합니다. [발행처 PDF](https://cdn.realfood.gov/DGA.pdf) · [검증한 미러 사본](https://github.com/wachin/Dietary-Guidelines-for-Americans-2025-2030/blob/e1d210fd1d709ee9d9893f12bbb77ea073512926/DGA.pdf)
 
 ```bash
 curl --fail --location https://cdn.realfood.gov/DGA.pdf --output data/reference.pdf
 sha256sum data/reference.pdf
 ```
 
-Windows에서는 `Invoke-WebRequest https://cdn.realfood.gov/DGA.pdf -OutFile data/reference.pdf`로 내려받고 `Get-FileHash data/reference.pdf -Algorithm SHA256`으로 확인할 수 있습니다.
+Windows에서는 발행처 URL에서 내려받습니다. 발행처 연결이 어려우면 아래 주석의 고정 커밋 미러 URL을 대신 사용할 수 있습니다.
+
+```powershell
+$pdf = "https://cdn.realfood.gov/DGA.pdf"
+# $pdf = "https://raw.githubusercontent.com/wachin/Dietary-Guidelines-for-Americans-2025-2030/e1d210fd1d709ee9d9893f12bbb77ea073512926/DGA.pdf"
+Invoke-WebRequest $pdf -OutFile data/reference.pdf
+Get-FileHash data/reference.pdf -Algorithm SHA256
+```
 
 지원하는 사본의 SHA-256은 `c34f1bec5c9416265670b7fcb24556bb8616ba95e8de2f2890460b6bbca1a472`입니다. 검색 함수는 일치하는 사본만 발췌하고, 파일이 없거나 다른 문서이면 그 상태를 안내합니다. PDF와 개인 섭취 기록은 Git에 포함하지 않습니다.
 

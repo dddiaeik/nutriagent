@@ -1,0 +1,163 @@
+/* Application components plus Streamlit's documented st-key-* container class. */
+.st-key-nutriagent_header {
+  background: radial-gradient(ellipse at 100% 0%, #cce9d8 0, transparent 60%), #eaf5ef;
+  border: 1px solid #d5e8de;
+  border-radius: 1.15rem;
+  padding: clamp(1rem, 2.7vw, 2.2rem);
+  position: relative;
+}
+.st-key-nutriagent_header::after {
+  content: "";
+  position: absolute;
+  inset: 0 2.2rem 0 auto;
+  width: 5.8rem;
+  pointer-events: none;
+  background: var(--na-mark) no-repeat center / contain;
+}
+.st-key-nutriagent_header h1 {
+  color: #18241e;
+  font-size: clamp(2.05rem, 5vw, 3.5rem);
+  letter-spacing: -.045em;
+  line-height: 1.05;
+  padding: 0;
+}
+.st-key-nutriagent_chat { margin-inline: auto; }
+.na-dashboard {
+  color: #18241e;
+  display: grid;
+  gap: .56rem;
+  font-variant-numeric: tabular-nums;
+}
+.na-goal {
+  background: #f7f9f8;
+  border: 1px solid #e2e8e4;
+  border-radius: .72rem;
+  padding: .58rem .72rem;
+}
+.na-goal__top, .na-goal__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  column-gap: .45rem;
+}
+.na-goal__top {
+  font-size: .87rem;
+  font-weight: 700;
+}
+.na-goal__bottom {
+  color: #526158;
+  font-size: .76rem;
+}
+.na-goal progress {
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: .32rem;
+  border: 0;
+  border-radius: .4rem;
+  margin: .35rem 0 .26rem;
+  background: #dce8e1;
+  overflow: hidden;
+}
+.na-goal progress::-webkit-progress-bar { background: #dce8e1; }
+.na-goal progress::-webkit-progress-value { background: #287d5a; }
+.na-goal progress::-moz-progress-bar { background: #287d5a; }
+.na-nutrients {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7.3rem), 1fr));
+  gap: .48rem;
+  margin: .45rem 0 .65rem;
+  font-variant-numeric: tabular-nums;
+}
+.na-nutrient {
+  border: 1px solid #d9e4de;
+  border-radius: .8rem;
+  padding: .75rem;
+  color: #18241e;
+  background: #fff;
+  min-width: 0;
+}
+.na-nutrient:first-child { background: #eaf5ef; border-color: #cfe4d8; }
+.na-nutrient__label {
+  color: #526158;
+  font-size: .82rem;
+  font-weight: 650;
+}
+.na-nutrient__value {
+  display: block;
+  font-size: clamp(1.15rem, 2vw, 1.55rem);
+  font-weight: 750;
+  overflow-wrap: anywhere;
+  line-height: 1.18;
+}
+.na-nutrient:first-child .na-nutrient__value { color: #195f43; }
+.na-nutrient__unit { font-size: .75rem; font-weight: 550; }
+.na-impacts { display: grid; gap: .35rem; }
+.na-impact {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1.5fr;
+  gap: .35rem;
+  align-items: baseline;
+  padding: .55rem .65rem;
+  border: 1px solid #d9e4de;
+  border-radius: .65rem;
+  background: #f7f9f8;
+  color: #18241e;
+  font-size: .85rem;
+  font-variant-numeric: tabular-nums;
+}
+.na-impact small { display: block; color: #526158; }
+.na-impact span:last-child { font-weight: 700; }
+.na-meal-table {
+  width: 100%;
+  border: 1px solid #d9e4de;
+  border-radius: .7rem;
+  border-spacing: 0;
+  overflow: hidden;
+  background: #fff;
+  color: #18241e;
+  font-size: .87rem;
+  font-variant-numeric: tabular-nums;
+}
+.na-meal-table th, .na-meal-table td { padding: .58rem .68rem; text-align: left; }
+.na-meal-table thead { background: #eaf5ef; color: #35473d; }
+.na-meal-table tbody td { white-space: nowrap; }
+.na-meal-table tbody tr + tr > * { border-top: 1px solid #e2e8e4; }
+.na-meal-table td span { display: none; }
+.na-status {
+  display: inline-block;
+  margin: .15rem 0;
+  padding: .2rem .56rem;
+  border-radius: 1rem;
+  border: 1px solid #d9e4de;
+  background: #f4f7f5;
+  color: #35473d;
+  font-size: .78rem;
+  font-weight: 700;
+}
+.na-status--ready { background: #eaf5ef; color: #195f43; }
+.na-status--pending { background: #fff5df; color: #744b13; border-color: #ead8b3; }
+@media (max-width: 600px) {
+  .st-key-nutriagent_header::after { display: none; }
+  .na-nutrients { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .na-meal-table, .na-meal-table tbody { display: block; }
+  .na-meal-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .na-meal-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: .5rem;
+  }
+  .na-meal-table tbody tr + tr { border-top: 1px solid #e2e8e4; }
+  .na-meal-table tbody tr + tr > * { border: 0; }
+  .na-meal-table th[scope="row"] { grid-column: 1 / -1; }
+  .na-meal-table th, .na-meal-table td { padding: .26rem .42rem; }
+  .na-meal-table tbody td { white-space: normal; }
+  .na-meal-table td span { display: block; color: #526158; font-size: .76rem; }
+}

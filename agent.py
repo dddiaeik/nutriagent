@@ -22,6 +22,14 @@ PDF_PATH = DATA / "reference.pdf"
 PDF_TITLE = "USDA/HHS Dietary Guidelines for Americans, 2025–2030"
 PDF_URL = "https://cdn.realfood.gov/DGA.pdf"
 PDF_SHA256 = "c34f1bec5c9416265670b7fcb24556bb8616ba95e8de2f2890460b6bbca1a472"
+GUIDELINE_KEYWORDS = {
+    "통곡물": "whole grains",
+    "단백질": "protein",
+    "식이섬유": "fiber",
+    "첨가당": "added sugars",
+    "건강한 지방": "healthy fats",
+}
+SENTENCE_BREAK = re.compile(r'(?<![A-Z]\.)(?<!\be\.g\.)(?<!\bi\.e\.)(?<!\bDr\.)(?<=[.!?])\s+(?=["“(]?[A-Z])')
 
 
 class Mode(StrEnum):
@@ -168,7 +176,13 @@ MOCK_SCENARIOS = {
         {"food": "미등록디저트", "quantity": 100, "unit": "g"},
     ]}),
     "영양 가이드에서 whole grains를 검색해 줘": ("search_guidelines", {"query": "whole grains"}),
+    "영양 가이드에서 통곡물에 대해 찾아 줘.": ("search_guidelines", {"query": "통곡물"}),
 }
+MOCK_SCENARIOS.update({
+    "김치찌개 200g과 쌀밥 150g을 먹었어.": MOCK_SCENARIOS["김치찌개 200g과 쌀밥 150g을 계산해 줘"],
+    "오늘 남은 영양 목표에 맞춰 저녁을 추천해 줘.": MOCK_SCENARIOS["오늘 목표에 맞춰 저녁을 추천해 줘"],
+    "닭가슴살 대신 두부 150g으로 바꿔 줘.": MOCK_SCENARIOS["닭가슴살 대신 두부 150g"],
+})
 
 
 def _mock_message(messages: list) -> ollama.Message:
@@ -183,9 +197,7 @@ def _mock_message(messages: list) -> ollama.Message:
     return ollama.Message(role="assistant")
 
 
-def search_guidelines(path: Path, query: str) -> list[dict]:
-    if not isinstance(query, str) or not query.strip() or len(query) > 100:
-        raise InputError("검색할 짧은 영문 키워드를 알려 주세요.")
+def read_verified_pdf(path: Path) -> bytes:
     try:
         data = path.read_bytes()
     except FileNotFoundError:
@@ -194,22 +206,46 @@ def search_guidelines(path: Path, query: str) -> list[dict]:
         raise InputError("영양기준 PDF를 읽을 수 없습니다.") from None
     if hashlib.sha256(data).hexdigest() != PDF_SHA256:
         raise InputError("이 데모의 영양기준 PDF와 일치하지 않습니다. README에서 지원하는 문서를 확인해 주세요.")
-    keyword = re.compile(re.escape(query.strip()), re.IGNORECASE)
+    return data
+
+
+def search_guidelines(path: Path, query: str) -> list[dict]:
+    if not isinstance(query, str) or not query.strip() or len(query) > 100:
+        raise InputError("검색할 짧은 키워드를 알려 주세요. 예를 들어 통곡물 또는 whole grains를 입력해 주세요.")
+    phrase = " ".join(query.split())
+    term = GUIDELINE_KEYWORDS.get(phrase, phrase)
+    keyword = re.compile(re.escape(term), re.IGNORECASE)
+    data = read_verified_pdf(path)
     hits = []
+    fallback = []
+    seen = set()
     try:
         with pymupdf.open(stream=data, filetype="pdf") as document:
             for page in document:
-                content = " ".join(page.get_text().split())
-                match = keyword.search(content)
-                if match:
-                    start = max(0, match.start() - 70)
-                    end = match.end() + 110
-                    hits.append({"page": page.number + 1, "quote": content[start:end]})
-                if len(hits) == 3:
-                    break
+                for block in page.get_text("blocks", sort=True):
+                    if block[6] != 0:
+                        continue
+                    content = " ".join(block[4].split())
+                    if not keyword.search(content):
+                        continue
+                    complete = [sentence for sentence in SENTENCE_BREAK.split(content)
+                                if sentence[-1:] in ".!?" and keyword.search(sentence)
+                                and re.match(r'(?:[+•−-]\s*)?["“(]?[A-Z]', sentence)]
+                    for quote in complete or [content]:
+                        normal = quote.casefold()
+                        if normal in seen:
+                            continue
+                        seen.add(normal)
+                        result = {"page": page.number + 1, "quote": quote}
+                        if complete:
+                            hits.append(result)
+                            if len(hits) == 3:
+                                return hits
+                        elif len(fallback) < 3:
+                            fallback.append(result)
     except (pymupdf.FileDataError, OSError):
         raise InputError("영양기준 PDF를 열 수 없습니다.") from None
-    return hits
+    return (hits + fallback)[:3]
 
 
 @dataclass
@@ -239,6 +275,7 @@ class Reply:
     candidates: list[Candidate] = field(default_factory=list)
     impact: GoalImpact | None = None
     changes: dict[str, float] = field(default_factory=dict)
+    previous_meal: Meal | None = None
     food: dict | None = None
     hits: list[dict] = field(default_factory=list)
     tool_log: list[dict] = field(default_factory=list)
@@ -272,6 +309,7 @@ def _execute(name, args, reply, previous_meal, pdf_path, today_totals, goals):
             quantity = args.get("quantity")
             reply.meal = replace_food(previous_meal, args.get("old_food"), args.get("new_food"),
                                       quantity=quantity, unit=args.get("unit"))
+            reply.previous_meal = previous_meal
             reply.kind = "recommendation"
             reply.impact = evaluate_meal(reply.meal, today_totals, goals)
             reply.changes = {key: reply.meal.totals[key] - previous_meal.totals[key] for key in NUTRIENTS}
