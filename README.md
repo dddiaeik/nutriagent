@@ -1,11 +1,11 @@
-# NutriAgent Lite · NutriGap V1.2
+# NutriAgent V1.3 · NutriGap
 
 Python이 등록 식품의 열량, 탄수화물, 단백질, 지방을 계산합니다. 두 실행 모드는 같은 식품 데이터, 계산 도구, 세션 기록을 사용합니다. 사용자가 화면에서 확정한 식단만 섭취 기록에 추가됩니다.
 
 | `NUTRIAGENT_MODE` | 용도 | 채팅 입력 |
 | --- | --- | --- |
 | `MOCK` (기본값) | 노트북 개발 및 오프라인 테스트 | 화면의 **MOCK 예시 문장**을 입력하면 미리 정의한 도구 호출을 실행 |
-| `OLLAMA` | Windows RTX 2080 SUPER에서 최종 시연 | 실제 `qwen3:8b`가 요청을 해석하고 도구 호출을 선택 |
+| `OLLAMA` | Windows RTX 2080 SUPER에서 최종 시연 | 선택한 모델이 요청을 해석하고 도구를 호출. 기본 `qwen3:8b` |
 
 화면은 실행 모드와 각 응답의 출처를 표시합니다. Ollama 요청이 실패하면 연결 또는 모델 상태를 확인하라는 안내를 표시합니다.
 
@@ -51,38 +51,53 @@ Windows 10 22H2 이상에서 Python 3.11.9와 Windows용 Ollama를 설치합니�
 새 PowerShell에서 저장소를 복제하고 패키지를 설치합니다. `py -3.11 --version` 출력이 `Python 3.11.9`인지 확인합니다.
 
 ```powershell
-git clone --branch feature/nutrigap-kfind-v1 https://github.com/dddiaeik/nutriagent.git
+git clone --branch feature/qwen35-agent-optimization-v1 https://github.com/dddiaeik/nutriagent.git
 Set-Location nutriagent
 py -3.11 --version
 py -3.11 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-시연 전에 모델을 내려받고, 응답과 GPU 사용 여부를 확인합니다. `ollama ps`의 `PROCESSOR` 열에서 GPU 사용 여부와 CPU 혼용 여부를 확인할 수 있습니다.
+시연 전에 `ollama list`에서 사용할 모델 태그를 확인합니다. 짧은 예열 요청 후 `ollama ps`의 `PROCESSOR` 열에서 GPU 사용 여부와 CPU 혼용 여부를 확인할 수 있습니다. 아래 명령은 Qwen3.5 모델이 이미 설치된 PC에서 실행합니다.
 
 ```powershell
 nvidia-smi
-ollama pull qwen3:8b
 ollama list
-ollama run qwen3:8b "한 문장으로 인사해 줘."
+ollama run qwen3.5:9b-q4_K_M "한 문장으로 인사해 줘."
 ollama ps
 ```
 
-Ollama와 모델이 준비되면 `NUTRIAGENT_MODE`만 바꿔 같은 앱을 실행합니다. 모드를 바꿀 때는 Streamlit을 다시 시작합니다.
+Ollama와 모델이 준비되면 PowerShell에서 환경변수를 설정하고 Streamlit을 시작합니다.
 
 ```powershell
 $env:NUTRIAGENT_MODE = "OLLAMA"
+$env:NUTRIAGENT_MODEL = "qwen3.5:9b-q4_K_M"
 .\.venv\Scripts\python.exe -m streamlit run app.py
 ```
 
 기본 서버 주소는 `http://127.0.0.1:11434`입니다. 다른 Ollama 서버를 사용한다면 Streamlit을 시작하는 PowerShell에서 `$env:OLLAMA_HOST`에 주소를 지정합니다. 오프라인으로 시연하려면 `$env:NUTRIAGENT_MODE = "MOCK"`으로 설정합니다.
+
+### 모델과 추론 설정
+
+| 환경변수 | 기본값 | 허용 값 |
+| --- | --- | --- |
+| `NUTRIAGENT_MODEL` | `qwen3:8b` | Ollama에 설치된 모델 이름 또는 태그 |
+| `NUTRIAGENT_THINK` | `false` | `true` / `false` 또는 `1` / `0` |
+| `NUTRIAGENT_TEMPERATURE` | `0` | 0 이상의 유한한 숫자 |
+| `NUTRIAGENT_NUM_CTX` | `4096` | 양의 정수 |
+| `NUTRIAGENT_NUM_PREDICT` | `512` | 양의 정수 |
+| `NUTRIAGENT_KEEP_ALIVE` | `30m` | `10m` 등 유지 시간, `0` 즉시 해제, `-1` 계속 유지 |
+
+전체 식품 목록은 사이드바에서 볼 수 있으며 Python 조회는 전체 데이터와 별칭을 사용합니다. 모델에는 전체 식품 목록 대신 직전 식단과 최근 대화만 전달합니다. 일반 턴은 직전 1턴을 전달하고, 추가 질문 직후에는 앞선 조건을 보존하기 위해 최대 5턴을 전달합니다.
+
+**Ollama 추론 지표**에는 API 호출별 `prompt_tokens`와 `output_tokens` 및 모델 로딩·입력 처리·출력 생성·Ollama 전체 시간을 밀리초로 표시합니다. Agent 전체 시간에는 모든 모델 호출, 서버 왕복 및 Python 도구 실행이 들어갑니다. Ollama가 제공하지 않은 지표는 비워 두며, MOCK에는 실측 지표가 표시되지 않습니다.
 
 ## 시연 순서
 
 1. “김치찌개 200g과 쌀밥 150g을 계산해 줘”를 입력하고 **이 식단을 섭취 기록에 추가**를 누릅니다. K-FIND 출처와 오늘 누적 371 kcal를 확인합니다.
 2. 오늘의 시연용 목표로 열량 820 kcal와 단백질 60g을 입력합니다. 입력하지 않은 탄수화물과 지방은 목표 비교에서 빠집니다.
 3. “오늘 목표에 맞춰 저녁을 추천해 줘”를 입력합니다. 닭가슴살과 잡곡밥 후보는 445 kcal로, 이 후보를 더했을 때 남는 열량은 449 kcal에서 4 kcal로 줄어듭니다.
-4. “닭가슴살 대신 두부”를 입력합니다. 같은 중량을 사용한 대체 결과와 목표 차이를 확인합니다. 오늘 확정 기록은 371 kcal로 유지됩니다.
+4. “닭가슴살 대신 두부”를 입력하면 기존 중량을 사용합니다. 추천을 다시 요청한 뒤 “닭가슴살 대신 두부 150g”을 입력하면 새 중량으로 대체합니다. 두 경우 모두 오늘 확정 기록은 371 kcal로 유지됩니다.
 5. 사이드바의 **오늘 기록 수정·철회**에서 중량을 바꾸거나 확정 기록을 철회합니다. 필요하면 **이전 대화 상세 보기**에서 오래된 후보의 표와 도구 로그를 다시 엽니다.
 6. 아래 PDF를 준비한 경우 “영양 가이드에서 whole grains를 검색해 줘”를 입력해 원문 발췌와 PDF 페이지를 확인합니다.
 
@@ -105,9 +120,9 @@ Windows에서는 `Invoke-WebRequest https://cdn.realfood.gov/DGA.pdf -OutFile da
 
 오프라인 자동 테스트는 `python -m pytest -q -rs`로 실행합니다. Windows에서는 `python` 대신 `.\.venv\Scripts\python.exe`를 사용할 수 있습니다. 이 테스트는 앱의 `MOCK` 응답과 모의 클라이언트를 사용한 `OLLAMA` 연결 실패 처리를 검증합니다.
 
-실제 Qwen3:8B 테스트는 서버와 모델이 준비된 뒤 별도로 실행합니다.
+실제 모델 테스트는 서버가 준비된 뒤 별도로 실행합니다. Qwen3.5와 기본 Qwen3가 둘 다 설치되어 있으면 한국어 도구 선택, 인자 추출, 모호한 입력, K-FIND 인분, 대체 중량, 목표 추천을 같은 테스트 문장으로 비교합니다. 설치되지 않은 모델은 건너뛰며, 모델별·사례별 호출 지표를 JSON으로 출력합니다.
 
 ```powershell
 $env:NUTRIAGENT_LIVE_OLLAMA = "1"
-.\.venv\Scripts\python.exe -m pytest -q -k live_qwen_inference
+.\.venv\Scripts\python.exe -m pytest -q -rs -s -k live_qwen_inference
 ```

@@ -45,10 +45,10 @@ Write-Host "[4/4] Real Ollama integration"
 if ($Live) {
     $env:NUTRIAGENT_MODE = "OLLAMA"
     $env:NUTRIAGENT_LIVE_OLLAMA = "1"
-    & $python -m pytest -q -rs -k live_qwen_inference
+    & $python -m pytest -q -rs -s -k live_qwen_inference
     if ($LASTEXITCODE -ne 0) { throw "Live Ollama integration failed" }
 } else {
-    Write-Host "SKIP: live inference not requested. Use -Live on a PC with qwen3:8b installed."
+    Write-Host "SKIP: live inference not requested. Use -Live on a PC with qwen3.5:9b-q4_K_M or qwen3:8b installed."
 }
 
 Write-Host "Verification finished. See PASS/SKIP results above."
