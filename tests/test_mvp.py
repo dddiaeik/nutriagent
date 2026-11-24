@@ -113,7 +113,7 @@ def test_mock_ui_confirmation_and_recommendation(monkeypatch):
     monkeypatch.delenv("NUTRIAGENT_MODE", raising=False)
     monkeypatch.setattr(agent.ollama, "Client", offline_only)
     screen = AppTest.from_file("app.py", default_timeout=15).run()
-    assert screen.title[0].value == "NutriAgent Lite"
+    assert screen.title[0].value == "NutriAgent"
     assert screen.caption[0].value == "실행 모드: MOCK · 미리 정의한 응답"
     screen.chat_input[0].set_value("닭가슴살 2인분과 흰쌀밥 100g을 계산해 줘").run()
     assert not screen.exception
@@ -138,10 +138,10 @@ def test_chat_history_keeps_old_meal_details_and_confirmation_accessible(monkeyp
     for _ in range(4):
         screen.chat_input[0].set_value("닭가슴살 2인분과 흰쌀밥 100g을 계산해 줘").run()
     assert not screen.exception
-    assert len(screen.table) == 3
+    assert sum('class="na-meal-table"' in element.proto.body for element in screen.main.get("html")) == 3
     assert any("합계 열량 (kcal) 460" in caption.value for caption in screen.caption)
     screen.selectbox[0].select(0).run()
-    assert len(screen.table) == 4
+    assert sum('class="na-meal-table"' in element.proto.body for element in screen.main.get("html")) == 4
     screen.button(key="record-0").click().run()
     assert not screen.exception
     assert list(screen.session_state.records) == [0]

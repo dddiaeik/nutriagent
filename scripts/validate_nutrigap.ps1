@@ -34,7 +34,7 @@ if (Test-Path $xlsx) {
 }
 
 Write-Host "[3/4] Python compile and offline pytest"
-& $python -m compileall -q app.py agent.py nutrition.py nutrigap.py kfind_catalog.py scripts tests
+& $python -m compileall -q app.py ui.py agent.py nutrition.py nutrigap.py kfind_catalog.py scripts tests
 if ($LASTEXITCODE -ne 0) { throw "Compilation failed" }
 $env:NUTRIAGENT_MODE = "MOCK"
 $env:NUTRIAGENT_LIVE_OLLAMA = "0"

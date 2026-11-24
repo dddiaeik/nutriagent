@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">NutriAgent leaf candidate</title>
+  <path fill="#287d5a" d="M58 7C36 3 10 11 8 34c-1 13 9 23 22 23C53 57 58 30 58 7Z"/>
+  <path d="m17 51 12-12m-2-9 8 8 13-16" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="5"/>
+</svg>
