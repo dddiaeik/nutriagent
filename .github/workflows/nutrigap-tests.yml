@@ -6,6 +6,7 @@ on:
       - feature/nutrigap-kfind-v1
       - feature/qwen35-agent-optimization-v1
       - feature/nutriagent-ui-branding-v1
+      - experiment/tool-architecture-ab-v1
   pull_request:
     branches:
       - main
@@ -37,9 +38,10 @@ jobs:
       - name: Check dependencies
         run: python -m pip check
       - name: Compile Python
-        run: python -m compileall -q app.py ui.py agent.py nutrition.py nutrigap.py kfind_catalog.py scripts tests
+        run: python -m compileall -q app.py ui.py agent.py nutrition.py nutrigap.py kfind_catalog.py evaluation scripts tests
       - name: Run offline regression tests
         env:
           NUTRIAGENT_MODE: MOCK
+          NUTRIAGENT_TOOL_ARCHITECTURE: LEGACY
           NUTRIAGENT_LIVE_OLLAMA: '0'
         run: python -m pytest -q -rs

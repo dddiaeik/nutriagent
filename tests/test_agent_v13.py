@@ -301,7 +301,8 @@ def test_live_qwen_inference(model):
     failures = []
     for case in CASES + SWAP_CASES:
         reply = agent.run_turn([{"role": "user", "content": case[1]}], _reference_meal(case),
-                               mode=agent.Mode.OLLAMA, goals=GOALS, today_totals=MEAL.totals, settings=settings)
+                               mode=agent.Mode.OLLAMA, goals=GOALS, today_totals=MEAL.totals, settings=settings,
+                               architecture=agent.ToolArchitecture.LEGACY)
         print(json.dumps({"model": model, "case": case[0], "settings": asdict(settings),
                           "agent_ms": reply.agent_ms, "calls": [asdict(call) for call in reply.inference]}))
         try:

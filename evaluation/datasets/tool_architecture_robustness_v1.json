@@ -1,0 +1,1002 @@
+{
+  "version": "tool-architecture-robustness-v1",
+  "fixture": {
+    "goals": {
+      "kcal": 820,
+      "protein_g": 60
+    },
+    "prior_meals": {
+      "single": [
+        {
+          "food": "닭가슴살",
+          "quantity": 100,
+          "unit": "g"
+        },
+        {
+          "food": "흰쌀밥",
+          "quantity": 100,
+          "unit": "g"
+        }
+      ],
+      "split": [
+        {
+          "food": "닭가슴살",
+          "quantity": 120,
+          "unit": "g"
+        },
+        {
+          "food": "닭가슴살",
+          "quantity": 80,
+          "unit": "g"
+        },
+        {
+          "food": "흰쌀밥",
+          "quantity": 100,
+          "unit": "g"
+        }
+      ]
+    },
+    "confirmed_meal": [
+      {
+        "food": "닭가슴살",
+        "quantity": 100,
+        "unit": "g"
+      },
+      {
+        "food": "흰쌀밥",
+        "quantity": 100,
+        "unit": "g"
+      }
+    ],
+    "confirmed_date": "2026-01-01"
+  },
+  "cases": [
+    {
+      "id": "half",
+      "history": [
+        {
+          "role": "user",
+          "content": "닭가슴살 대신 두부를 반만 넣어 줘."
+        }
+      ],
+      "prior_meal": "single",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "ask_clarification",
+            "input": {
+              "missing": "quantity"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "ask_clarification",
+            "input": {
+              "missing": "quantity"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "clarification",
+        "kind": "quantity",
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "relative",
+      "history": [
+        {
+          "role": "user",
+          "content": "닭가슴살 대신 두부를 절반만 담아 줘."
+        }
+      ],
+      "prior_meal": "single",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "ask_clarification",
+            "input": {
+              "missing": "quantity"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "ask_clarification",
+            "input": {
+              "missing": "quantity"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "clarification",
+        "kind": "quantity",
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "relative-more",
+      "history": [
+        {
+          "role": "user",
+          "content": "닭가슴살 대신 두부를 기존보다 30g 더 넣어 줘."
+        }
+      ],
+      "prior_meal": "single",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "ask_clarification",
+            "input": {
+              "missing": "quantity"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "ask_clarification",
+            "input": {
+              "missing": "quantity"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "clarification",
+        "kind": "quantity",
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "range",
+      "history": [
+        {
+          "role": "user",
+          "content": "닭가슴살 대신 두부 150~200g으로 바꿔 줘."
+        }
+      ],
+      "prior_meal": "single",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "ask_clarification",
+            "input": {
+              "missing": "quantity"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "ask_clarification",
+            "input": {
+              "missing": "quantity"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "clarification",
+        "kind": "quantity",
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "negated-keep",
+      "history": [
+        {
+          "role": "user",
+          "content": "닭가슴살 대신 두부 150g은 아니고 기존 중량으로 해 줘."
+        }
+      ],
+      "prior_meal": "split",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "replace_food",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "replace_food",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "recommendation",
+        "lines": [
+          [
+            "두부",
+            120.0
+          ],
+          [
+            "두부",
+            80.0
+          ],
+          [
+            "흰쌀밥",
+            100.0
+          ]
+        ],
+        "nutrients": {
+          "kcal": 418.0,
+          "carbs_g": 33.730000000000004,
+          "protein_g": 37.23,
+          "fat_g": 17.720000000000002
+        },
+        "goal_gap": {
+          "before": {
+            "kcal": 525.0,
+            "protein_g": 26.29
+          },
+          "after": {
+            "kcal": 107.0,
+            "protein_g": -10.939999999999998
+          }
+        },
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "negated-without-target",
+      "history": [
+        {
+          "role": "user",
+          "content": "닭가슴살 대신 두부 140g은 빼고 다른 중량으로 바꿔 줘."
+        }
+      ],
+      "prior_meal": "single",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "ask_clarification",
+            "input": {
+              "missing": "quantity"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "ask_clarification",
+            "input": {
+              "missing": "quantity"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "clarification",
+        "kind": "quantity",
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "unrelated-rice",
+      "history": [
+        {
+          "role": "user",
+          "content": "닭가슴살 대신 두부로 바꾸고 쌀밥은 150g으로 유지해 줘."
+        }
+      ],
+      "prior_meal": "single",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "ask_clarification",
+            "input": {
+              "missing": "quantity"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "ask_clarification",
+            "input": {
+              "missing": "quantity"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "clarification",
+        "kind": "quantity",
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "both-weights",
+      "history": [
+        {
+          "role": "user",
+          "content": "닭가슴살 100g 대신 두부 175g으로 해 줘."
+        }
+      ],
+      "prior_meal": "single",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "replace_food",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부",
+              "quantity": 175,
+              "unit": "g"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "replace_food_with_weight",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부",
+              "quantity": 175,
+              "unit": "g"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "recommendation",
+        "lines": [
+          [
+            "두부",
+            175.0
+          ],
+          [
+            "흰쌀밥",
+            100.0
+          ]
+        ],
+        "nutrients": {
+          "kcal": 382.0,
+          "carbs_g": 33.035000000000004,
+          "protein_g": 32.9125,
+          "fat_g": 15.540000000000001
+        },
+        "goal_gap": {
+          "before": {
+            "kcal": 525.0,
+            "protein_g": 26.29
+          },
+          "after": {
+            "kcal": 143.0,
+            "protein_g": -6.622500000000002
+          }
+        },
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "old-weight-without-marker",
+      "history": [
+        {
+          "role": "user",
+          "content": "닭가슴살 100g을 두부로 교체해 줘."
+        }
+      ],
+      "prior_meal": "single",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "replace_food",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "replace_food",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "recommendation",
+        "lines": [
+          [
+            "두부",
+            100.0
+          ],
+          [
+            "흰쌀밥",
+            100.0
+          ]
+        ],
+        "nutrients": {
+          "kcal": 274.0,
+          "carbs_g": 30.950000000000003,
+          "protein_g": 19.96,
+          "fat_g": 9.0
+        },
+        "goal_gap": {
+          "before": {
+            "kcal": 525.0,
+            "protein_g": 26.29
+          },
+          "after": {
+            "kcal": 251.0,
+            "protein_g": 6.329999999999998
+          }
+        },
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "explicit-same-kg",
+      "history": [
+        {
+          "role": "user",
+          "content": "닭가슴살 대신 두부 0.1kg으로 교체해 줘."
+        }
+      ],
+      "prior_meal": "single",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "replace_food",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부",
+              "quantity": 0.1,
+              "unit": "kg"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "replace_food_with_weight",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부",
+              "quantity": 0.1,
+              "unit": "kg"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "recommendation",
+        "lines": [
+          [
+            "두부",
+            100.0
+          ],
+          [
+            "흰쌀밥",
+            100.0
+          ]
+        ],
+        "nutrients": {
+          "kcal": 274.0,
+          "carbs_g": 30.950000000000003,
+          "protein_g": 19.96,
+          "fat_g": 9.0
+        },
+        "goal_gap": {
+          "before": {
+            "kcal": 525.0,
+            "protein_g": 26.29
+          },
+          "after": {
+            "kcal": 251.0,
+            "protein_g": 6.329999999999998
+          }
+        },
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "english-keep",
+      "history": [
+        {
+          "role": "user",
+          "content": "Replace 닭가슴살 with 두부 and keep the same weight."
+        }
+      ],
+      "prior_meal": "split",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "replace_food",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "replace_food",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "recommendation",
+        "lines": [
+          [
+            "두부",
+            120.0
+          ],
+          [
+            "두부",
+            80.0
+          ],
+          [
+            "흰쌀밥",
+            100.0
+          ]
+        ],
+        "nutrients": {
+          "kcal": 418.0,
+          "carbs_g": 33.730000000000004,
+          "protein_g": 37.23,
+          "fat_g": 17.720000000000002
+        },
+        "goal_gap": {
+          "before": {
+            "kcal": 525.0,
+            "protein_g": 26.29
+          },
+          "after": {
+            "kcal": 107.0,
+            "protein_g": -10.939999999999998
+          }
+        },
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "english-weight",
+      "history": [
+        {
+          "role": "user",
+          "content": "Use 140 grams of 두부 instead of 닭가슴살."
+        }
+      ],
+      "prior_meal": "single",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "replace_food",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부",
+              "quantity": 140,
+              "unit": "g"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "replace_food_with_weight",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부",
+              "quantity": 140,
+              "unit": "g"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "recommendation",
+        "lines": [
+          [
+            "두부",
+            140.0
+          ],
+          [
+            "흰쌀밥",
+            100.0
+          ]
+        ],
+        "nutrients": {
+          "kcal": 331.6,
+          "carbs_g": 32.062,
+          "protein_g": 26.868,
+          "fat_g": 12.488
+        },
+        "goal_gap": {
+          "before": {
+            "kcal": 525.0,
+            "protein_g": 26.29
+          },
+          "after": {
+            "kcal": 193.39999999999998,
+            "protein_g": -0.578000000000003
+          }
+        },
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "followup-weight",
+      "history": [
+        {
+          "role": "user",
+          "content": "닭가슴살 대신 두부를 조금 넣어 줘."
+        },
+        {
+          "role": "assistant",
+          "content": "각 음식의 양과 단위를 알려 주세요. 예를 들어 두부 150g처럼 입력해 주세요."
+        },
+        {
+          "role": "user",
+          "content": "150g이야."
+        }
+      ],
+      "prior_meal": "split",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "replace_food",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부",
+              "quantity": 150,
+              "unit": "g"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "replace_food_with_weight",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부",
+              "quantity": 150,
+              "unit": "g"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "recommendation",
+        "lines": [
+          [
+            "두부",
+            150.0
+          ],
+          [
+            "흰쌀밥",
+            100.0
+          ]
+        ],
+        "nutrients": {
+          "kcal": 346.0,
+          "carbs_g": 32.34,
+          "protein_g": 28.595000000000002,
+          "fat_g": 13.360000000000001
+        },
+        "goal_gap": {
+          "before": {
+            "kcal": 525.0,
+            "protein_g": 26.29
+          },
+          "after": {
+            "kcal": 179.0,
+            "protein_g": -2.305000000000007
+          }
+        },
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "followup-keep",
+      "history": [
+        {
+          "role": "user",
+          "content": "닭가슴살 대신 두부를 조금 넣어 줘."
+        },
+        {
+          "role": "assistant",
+          "content": "각 음식의 양과 단위를 알려 주세요. 예를 들어 두부 150g처럼 입력해 주세요."
+        },
+        {
+          "role": "user",
+          "content": "같은 양으로 해 줘."
+        }
+      ],
+      "prior_meal": "split",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "replace_food",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "replace_food",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "recommendation",
+        "lines": [
+          [
+            "두부",
+            120.0
+          ],
+          [
+            "두부",
+            80.0
+          ],
+          [
+            "흰쌀밥",
+            100.0
+          ]
+        ],
+        "nutrients": {
+          "kcal": 418.0,
+          "carbs_g": 33.730000000000004,
+          "protein_g": 37.23,
+          "fat_g": 17.720000000000002
+        },
+        "goal_gap": {
+          "before": {
+            "kcal": 525.0,
+            "protein_g": 26.29
+          },
+          "after": {
+            "kcal": 107.0,
+            "protein_g": -10.939999999999998
+          }
+        },
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "missing-meal",
+      "history": [
+        {
+          "role": "user",
+          "content": "아까 담은 닭가슴살 대신 두부로 바꿔 줘."
+        }
+      ],
+      "prior_meal": null,
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "ask_clarification",
+            "input": {
+              "missing": "meal"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "ask_clarification",
+            "input": {
+              "missing": "meal"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "clarification",
+        "kind": "meal",
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "compact-mass",
+      "history": [
+        {
+          "role": "user",
+          "content": "닭가슴살 대신 두부90g으로 교체해 줘."
+        }
+      ],
+      "prior_meal": "single",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "replace_food",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부",
+              "quantity": 90,
+              "unit": "g"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "replace_food_with_weight",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부",
+              "quantity": 90,
+              "unit": "g"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "recommendation",
+        "lines": [
+          [
+            "두부",
+            90.0
+          ],
+          [
+            "흰쌀밥",
+            100.0
+          ]
+        ],
+        "nutrients": {
+          "kcal": 259.6,
+          "carbs_g": 30.672,
+          "protein_g": 18.233,
+          "fat_g": 8.128
+        },
+        "goal_gap": {
+          "before": {
+            "kcal": 525.0,
+            "protein_g": 26.29
+          },
+          "after": {
+            "kcal": 265.4,
+            "protein_g": 8.057000000000002
+          }
+        },
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "paren-mass",
+      "history": [
+        {
+          "role": "user",
+          "content": "닭가슴살 대신 두부(125g)로 부탁해."
+        }
+      ],
+      "prior_meal": "single",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "replace_food",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부",
+              "quantity": 125,
+              "unit": "g"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "replace_food_with_weight",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부",
+              "quantity": 125,
+              "unit": "g"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "recommendation",
+        "lines": [
+          [
+            "두부",
+            125.0
+          ],
+          [
+            "흰쌀밥",
+            100.0
+          ]
+        ],
+        "nutrients": {
+          "kcal": 310.0,
+          "carbs_g": 31.645000000000003,
+          "protein_g": 24.2775,
+          "fat_g": 11.18
+        },
+        "goal_gap": {
+          "before": {
+            "kcal": 525.0,
+            "protein_g": 26.29
+          },
+          "after": {
+            "kcal": 215.0,
+            "protein_g": 2.012500000000003
+          }
+        },
+        "records_unchanged": true
+      }
+    },
+    {
+      "id": "spelled-unit",
+      "history": [
+        {
+          "role": "user",
+          "content": "닭가슴살 대신 두부 160그램을 넣어 줘."
+        }
+      ],
+      "prior_meal": "single",
+      "raw": {
+        "LEGACY": [
+          {
+            "tool": "replace_food",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부",
+              "quantity": 160,
+              "unit": "g"
+            }
+          }
+        ],
+        "SPLIT": [
+          {
+            "tool": "replace_food_with_weight",
+            "input": {
+              "old_food": "닭가슴살",
+              "new_food": "두부",
+              "quantity": 160,
+              "unit": "g"
+            }
+          }
+        ]
+      },
+      "effective": {
+        "type": "recommendation",
+        "lines": [
+          [
+            "두부",
+            160.0
+          ],
+          [
+            "흰쌀밥",
+            100.0
+          ]
+        ],
+        "nutrients": {
+          "kcal": 360.4,
+          "carbs_g": 32.618,
+          "protein_g": 30.322000000000003,
+          "fat_g": 14.232000000000001
+        },
+        "goal_gap": {
+          "before": {
+            "kcal": 525.0,
+            "protein_g": 26.29
+          },
+          "after": {
+            "kcal": 164.60000000000002,
+            "protein_g": -4.032000000000011
+          }
+        },
+        "records_unchanged": true
+      }
+    }
+  ]
+}

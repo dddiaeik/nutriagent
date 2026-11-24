@@ -228,6 +228,7 @@ __marimo__/
 /data/private/
 /data/reference.pdf
 /records/
+/evaluation-results/
 /uploads/
 /models/
 /.ollama/

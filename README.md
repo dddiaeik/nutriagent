@@ -162,3 +162,13 @@ try {
 ```
 
 두 버전에서 공통인 9개 사례만 모델별로 비교합니다. 각 로그의 `calls[].prompt_tokens` 합계와 `agent_ms`로 입력 토큰 수와 Agent 처리 시간을 비교하고, 모델 로딩 시간이 포함된 실행은 `calls[].load_ms`로 구분합니다. 설치되지 않은 모델의 평가 결과는 건너뜁니다.
+
+## V1.4.2 도구 구조 A/B 실험
+
+기본값 `NUTRIAGENT_TOOL_ARCHITECTURE=LEGACY`는 V1.4.1 구조를 유지합니다. `SPLIT`은 중량 유지와 새 총중량 대체를 서로 다른 도구로 호출합니다. 모델의 원본 호출과 Python이 보정한 최종 실행은 따로 채점합니다.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\evaluate_tool_architecture.ps1
+```
+
+모델 두 종을 구조별로 3회 평가하고 결과와 ZIP의 경로를 표시합니다. 모델을 다운로드하거나 기존 브랜치를 변경하는 절차는 포함하지 않습니다. [도구 구조](docs/TOOL_ARCHITECTURE_V1_4_2.md) · [실험 프로토콜](docs/EVALUATION_PROTOCOL_V1_4_2.md) · [검증 기록](docs/VALIDATION_V1_4_2.md)

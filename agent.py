@@ -39,6 +39,19 @@ class Mode(StrEnum):
     OLLAMA = "OLLAMA"
 
 
+class ToolArchitecture(StrEnum):
+    LEGACY = "LEGACY"
+    SPLIT = "SPLIT"
+
+
+def configured_tool_architecture() -> ToolArchitecture:
+    value = os.getenv("NUTRIAGENT_TOOL_ARCHITECTURE", "LEGACY").strip().upper()
+    try:
+        return ToolArchitecture(value)
+    except ValueError:
+        raise ValueError("NUTRIAGENT_TOOL_ARCHITECTURE는 LEGACY 또는 SPLIT이어야 합니다.") from None
+
+
 def configured_mode() -> Mode:
     value = os.getenv("NUTRIAGENT_MODE", Mode.MOCK).strip().upper()
     try:
@@ -167,6 +180,36 @@ SYSTEM_PROMPT = """한국어·영어 요청의 의도를 파악해 도구를 호
 어떤 도구도 실제 섭취 기록을 확정하지 않습니다.
 """
 
+KEEP_TOOL = "replace_food"
+WEIGHT_TOOL = "replace_food_with_weight"
+FOOD_ARGUMENTS = {"old_food": TEXT, "new_food": TEXT}
+SPLIT_TOOLS = [
+    *TOOLS[:4],
+    _tool(KEEP_TOOL, "기존 음식의 각 행 중량을 유지하면서 새 음식으로 대체.", FOOD_ARGUMENTS),
+    _tool(WEIGHT_TOOL, "사용자가 새 음식에 명시한 총중량으로 대체.", {
+        **FOOD_ARGUMENTS, "quantity": QUANTITY, "unit": UNIT,
+    }),
+    *TOOLS[5:],
+]
+_LEGACY_SWAP_LINES = "\n".join(SYSTEM_PROMPT.splitlines()[4:6])
+SPLIT_SYSTEM_PROMPT = SYSTEM_PROMPT.replace(_LEGACY_SWAP_LINES,
+    "음식 대체는 중량 유지면 replace_food, 새 음식의 총량을 숫자와 단위로 명시하면 replace_food_with_weight. "
+    "기존 음식에만 붙은 중량은 새 중량이 아닙니다. 기준 식단이 없으면 ask_clarification(meal), "
+    "새 중량이 모호하거나 범위·상대적인 양이면 ask_clarification(quantity)."
+)
+SWAP_INTENT = re.compile(r"대신|대체|교체|\b(?:replace|swap|instead of)\b", re.IGNORECASE)
+RELATIVE_WEIGHT = re.compile(r"반\s*만|절반|두\s*배|\d\s*배|보다.{0,18}(?:더|덜|많|적)|이상|이하|%|"
+                             r"줄여|늘려|\b(?:half|double|less|more|twice|over|under|at least|at most)\b",
+                             re.IGNORECASE)
+NEGATION = re.compile(r"아니|말고|빼고|제외|\b(?:not|rather than)\b", re.IGNORECASE)
+KEEP_AMOUNT = re.compile(r"그대로|(?:같은|기존|원래)\s*(?:양|중량|무게)|\b(?:same|original)\s+(?:weight|amount)\b",
+                         re.IGNORECASE)
+
+
+def tool_definition(architecture: ToolArchitecture):
+    return (SPLIT_SYSTEM_PROMPT, SPLIT_TOOLS) if architecture == ToolArchitecture.SPLIT else (SYSTEM_PROMPT, TOOLS)
+
+
 
 MOCK_SCENARIOS = {
     "김치찌개 200g과 쌀밥 150g을 계산해 줘": ("calculate_meal", {"items": [
@@ -201,12 +244,14 @@ MOCK_SCENARIOS.update({
 })
 
 
-def _mock_message(messages: list) -> ollama.Message:
+def _mock_message(messages: list, architecture=ToolArchitecture.LEGACY) -> ollama.Message:
     last = messages[-1]
     if last["role"] == "user":
         scenario = MOCK_SCENARIOS.get(last["content"].strip())
         if scenario:
             name, args = scenario
+            if architecture == ToolArchitecture.SPLIT and name == KEEP_TOOL and "quantity" in args:
+                name = WEIGHT_TOOL
             return ollama.Message(role="assistant", tool_calls=[
                 ollama.Message.ToolCall(function=ollama.Message.ToolCall.Function(name=name, arguments=args))
             ])
@@ -299,6 +344,19 @@ class Reply:
     needs_clarification: bool = False
     inference: list[InferenceMetrics] = field(default_factory=list)
     agent_ms: float | None = None
+    raw_calls: list[dict] = field(default_factory=list)
+    served_model: str | None = None
+    infrastructure_error: str | None = None
+
+
+def ollama_error_kind(error: Exception) -> str:
+    if isinstance(error, httpx.TimeoutException):
+        return "timeout"
+    if isinstance(error, ollama.ResponseError):
+        return "ollama_error"
+    if isinstance(error, (ConnectionError, httpx.RequestError)):
+        return "connection_error"
+    return "evaluation_error"
 
 
 def _named_weights(food):
@@ -308,10 +366,7 @@ def _named_weights(food):
             rf"{WEIGHT}\s*(?:의\s*|짜리\s*|of\s+)?{name}{particle}(?![가-힣a-z])")
 
 
-def _replacement_arguments(history, args):
-    """Ground an override in the user's words, never in the prior meal or model's quantity."""
-    users = [message["content"] for message in history if message["role"] == "user"]
-    request = users[-1] if users else ""
+def _replacement_target(request):
     target = request
     if "대신" in request:
         target = request.split("대신", 1)[1]
@@ -319,6 +374,14 @@ def _replacement_arguments(history, args):
         target = re.split(r"\binstead of\b", request, maxsplit=1, flags=re.IGNORECASE)[0]
     elif re.search(r"\b(?:replace|swap)\b", request, re.IGNORECASE):
         target = re.split(r"\b(?:with|for)\b", request, maxsplit=1, flags=re.IGNORECASE)[-1]
+    return target
+
+
+def _replacement_arguments(history, args):
+    """Ground an override in the user's words, never in the prior meal or model's quantity."""
+    users = [message["content"] for message in history if message["role"] == "user"]
+    request = users[-1] if users else ""
+    target = _replacement_target(request)
 
     effective = {key: value for key, value in args.items() if key not in {"quantity", "unit"}}
     new_food = args.get("new_food")
@@ -344,6 +407,40 @@ def _replacement_arguments(history, args):
     if UNCERTAIN_WEIGHT.search(re.sub(re.escape(new_food.strip()), "", target, flags=re.IGNORECASE)):
         raise InputError(REPLACEMENT_QUESTION)
     return effective
+
+
+def _split_execution(name, args, history, previous_meal):
+    users = [message["content"] for message in history if message["role"] == "user"]
+    request = users[-1] if users else ""
+    swap_request = SWAP_INTENT.search(request) or (
+        len(users) > 1 and len(history) >= 3 and history[-2]["role"] == "assistant"
+        and history[-2]["content"] in {REPLACEMENT_QUESTION, QUESTIONS["quantity"]}
+        and SWAP_INTENT.search(users[-2])
+    )
+    if name == "ask_clarification":
+        return name, args
+    if name not in {KEEP_TOOL, WEIGHT_TOOL}:
+        if swap_request:
+            raise InputError(QUESTIONS["meal"] if previous_meal is None else REPLACEMENT_QUESTION)
+        return name, args
+    if previous_meal is None:
+        raise InputError(QUESTIONS["meal"])
+    if not swap_request:
+        raise InputError(QUESTIONS["food"])
+
+    target = _replacement_target(request)
+    if RELATIVE_WEIGHT.search(target) or WEIGHT_RANGE.search(target):
+        raise InputError(REPLACEMENT_QUESTION)
+    if NEGATION.search(target):
+        # Accept one explicitly rejected amount only when the user also asks to retain the old amount.
+        mentions = list(re.finditer(WEIGHT, target, re.IGNORECASE))
+        if (len(mentions) != 1 or not NEGATION.search(target[mentions[0].end():])
+                or not KEEP_AMOUNT.search(target[mentions[0].end():])):
+            raise InputError(REPLACEMENT_QUESTION)
+        return KEEP_TOOL, {key: args[key] for key in FOOD_ARGUMENTS if key in args}
+    effective = _replacement_arguments(history, {key: val for key, val in args.items()
+                                                   if key in FOOD_ARGUMENTS or key in {"quantity", "unit"}})
+    return (WEIGHT_TOOL if "quantity" in effective else KEEP_TOOL), effective
 
 
 def _execute(name, args, reply, previous_meal, pdf_path, today_totals, goals):
@@ -389,61 +486,79 @@ def _execute(name, args, reply, previous_meal, pdf_path, today_totals, goals):
 
 def run_turn(history: list[dict], previous_meal: Meal | None = None, *,
              mode: Mode | None = None, goals: dict | None = None, pdf_path: Path = PDF_PATH,
-             today_totals: dict | None = None, settings: InferenceConfig | None = None) -> Reply:
+             today_totals: dict | None = None, settings: InferenceConfig | None = None,
+             architecture: ToolArchitecture | None = None, client: ollama.Client | None = None) -> Reply:
     """Use tool calls as proposals; present only Python-verified results."""
     start = perf_counter_ns()
     mode = configured_mode() if mode is None else Mode(mode)
     settings = configured_inference() if settings is None else settings
-    client = ollama.Client(timeout=90) if mode == Mode.OLLAMA else None
-    system = SYSTEM_PROMPT
+    if mode == Mode.OLLAMA and client is None:
+        client = ollama.Client(timeout=90)
+    architecture = configured_tool_architecture() if architecture is None else ToolArchitecture(architecture)
+    system, tools = tool_definition(architecture)
     if previous_meal:
         previous = ", ".join(f'{line.food["name"]} {line.grams:g}g' for line in previous_meal.lines)
         system += f"직전 식단: {previous}"
     messages = [{"role": "system", "content": system}, *history]
     totals = today_totals if today_totals is not None else dict.fromkeys(NUTRIENTS, 0.0)
-    reply = _run_tools(messages, history, previous_meal, pdf_path, totals, goals or {}, mode, settings, client)
-    if client is not None:
+    reply = _run_tools(messages, history, previous_meal, pdf_path, totals, goals or {}, mode, settings,
+                       client if mode == Mode.OLLAMA else None, architecture, tools)
+    if mode == Mode.OLLAMA:
         reply.agent_ms = (perf_counter_ns() - start) / 1_000_000
     return reply
 
 
-def _run_tools(messages, history, previous_meal, pdf_path, today_totals, goals, mode, settings, client):
+def _run_tools(messages, history, previous_meal, pdf_path, today_totals, goals, mode, settings, client, architecture, tools):
     reply = Reply(mode, model=settings.model)
     if mode == Mode.MOCK:
         reply.text = "등록된 MOCK 예시를 입력해 주세요. 화면의 예시 목록에서 복사할 수 있습니다."
     for _ in range(3):
         try:
             if client is None:
-                message = _mock_message(messages)
+                message = _mock_message(messages, architecture)
             else:
                 response = client.chat(
-                    model=settings.model, messages=messages, tools=TOOLS,
+                    model=settings.model, messages=messages, tools=tools,
                     think=settings.think, keep_alive=settings.keep_alive,
                     options={"temperature": settings.temperature, "num_ctx": settings.num_ctx,
                              "num_predict": settings.num_predict},
                 )
                 reply.inference.append(InferenceMetrics.from_response(response))
+                reply.served_model = response.model
                 message = response.message
-        except (ConnectionError, httpx.RequestError, ollama.ResponseError):
+        except (ConnectionError, httpx.RequestError, ollama.ResponseError) as error:
             return Reply(mode, model=settings.model, inference=reply.inference, tool_log=reply.tool_log,
+                         raw_calls=reply.raw_calls, served_model=reply.served_model,
+                         infrastructure_error=ollama_error_kind(error),
                          text=f"Ollama에서 {settings.model} 모델을 실행할 수 없습니다. 서버와 모델 설치 상태를 확인해 주세요.")
         if not message.tool_calls:
             reply.needs_clarification = reply.food is None
             return reply
         messages.append(message)
+        reply.raw_calls.extend({"tool": call.function.name, "input": dict(call.function.arguments)}
+                               for call in message.tool_calls)
         for call in message.tool_calls:
             name, args = call.function.name, call.function.arguments
             log_entry = {"tool": name, "input": args}
             try:
-                effective = _replacement_arguments(history, args) if name == "replace_food" and previous_meal else args
+                if architecture == ToolArchitecture.SPLIT:
+                    executed, effective = _split_execution(name, args, history, previous_meal)
+                else:
+                    executed = name
+                    effective = _replacement_arguments(history, args) if name == KEEP_TOOL and previous_meal else args
+                log_entry["executed_tool"] = executed
                 if effective != args:
                     log_entry["effective_input"] = effective
-                result = _execute(name, effective, reply, previous_meal, pdf_path, today_totals, goals)
+                dispatch = KEEP_TOOL if architecture == ToolArchitecture.SPLIT and executed == WEIGHT_TOOL else executed
+                result = _execute(dispatch, effective, reply, previous_meal, pdf_path, today_totals, goals)
             except InputError as error:
-                reply.tool_log.append({**log_entry, "status": str(error)})
+                reply.tool_log.append({**log_entry, "status": str(error), "validation": (
+                    "clarification" if log_entry.get("executed_tool") == "ask_clarification" else "blocked"
+                )})
                 return Reply(mode, model=settings.model, inference=reply.inference, text=str(error),
+                             raw_calls=reply.raw_calls, served_model=reply.served_model,
                              needs_clarification=True, tool_log=reply.tool_log)
-            reply.tool_log.append({**log_entry, "status": "완료"})
+            reply.tool_log.append({**log_entry, "status": "완료", "validation": "accepted"})
             if reply.meal is not None or name in ("search_guidelines", "recommend_for_goals"):
                 return reply
             messages.append({"role": "tool", "tool_name": name, "content": json.dumps(result, ensure_ascii=False)})
